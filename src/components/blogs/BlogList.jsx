@@ -5,21 +5,22 @@ import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useCrud from "@/hooks/useCrud";
-import formatDateTime from "@/helpers/formatDateTime";
-import uploadSingleFile from "@/helpers/uploadSingleFile";
 import Modal from "@/components/common/Modal";
 import TextEditor from "@/components/common/TextEditor";
-import Layout from "@/components/common/Layout";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
+import formatDateTime from "@/helpers/formatDateTime";
+import uploadSingleFile from "@/helpers/uploadSingleFile";
 
 const BlogList = ({ blogs, blogCategories, users }) => {
     const [search, setSearch] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
     const [filteredItems, setFilteredItems] = useState(blogs);
     const { createItem, updateItem, deleteItem, deleteMultipleItems, loading } =
         useCrud("blogs");
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAddOrEditModalOpen, setIsAddOrEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -33,21 +34,87 @@ const BlogList = ({ blogs, blogCategories, users }) => {
     const handleSearch = (e) => {
         const value = e.target.value.toLowerCase();
         setSearch(value);
+
         setFilteredItems(
-            blogs.filter((item) => item.title.toLowerCase().includes(value))
+            blogs.filter((item) => {
+                return (
+                    (item.title?.toLowerCase().includes(value) ?? false) ||
+                    (item.category?.name?.toLowerCase().includes(value) ??
+                        false) ||
+                    (item.status?.toLowerCase().includes(value) ?? false) ||
+                    (item.createdBy?.fullName?.toLowerCase().includes(value) ??
+                        false) ||
+                    (item.createdBy?.email?.toLowerCase().includes(value) ??
+                        false) ||
+                    (item.createdBy?.phone?.toLowerCase().includes(value) ??
+                        false) ||
+                    (item.createdBy?.username?.toLowerCase().includes(value) ??
+                        false) ||
+                    (item.createdBy?.role?.toLowerCase().includes(value) ??
+                        false)
+                );
+            })
         );
     };
 
-    // open modal for add/edit
-    const openModal = (item = null) => {
+    // search by date
+    const handleSearchByDate = (e) => {
+        e.preventDefault();
+
+        if (!startDate || !endDate) return;
+
+        const filtered = blogs.filter((item) => {
+            const blogDate = new Date(item.createdAt).getTime();
+            return (
+                blogDate >= new Date(startDate).getTime() &&
+                blogDate <= new Date(endDate).getTime()
+            );
+        });
+
+        setFilteredItems(filtered);
+    };
+
+    // reset date filter
+    const resetDateFilter = () => {
+        setStartDate("");
+        setEndDate("");
+        setFilteredItems(blogs);
+    };
+
+    // open modal for add or edit
+    const openAddOrEditModal = (item = null) => {
         setSelectedItem(item);
-        setIsModalOpen(true);
+        setIsAddOrEditModalOpen(true);
+    };
+
+    // close modal for add or edit
+    const closeAddOrEditModal = () => {
+        removeExixtingItems();
+        setIsAddOrEditModalOpen(false);
+    };
+
+    // open view modal
+    const openViewModal = (item) => {
+        setSelectedItem(item);
+        setIsViewModalOpen(true);
+    };
+
+    // close view modal
+    const closeViewModal = () => {
+        removeExixtingItems();
+        setIsViewModalOpen(false);
     };
 
     // open delete confirmation modal
     const openDeleteModal = (item) => {
         setSelectedItem(item);
         setIsDeleteModalOpen(true);
+    };
+
+    // close delete confirmation modal
+    const closeDeleteModal = () => {
+        removeExixtingItems();
+        setIsDeleteModalOpen(false);
     };
 
     // handle item creation or update
@@ -115,7 +182,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                 );
                 toast.success(response?.message);
                 setDescription("");
-                setIsModalOpen(false);
+                closeAddOrEditModal();
             } else {
                 toast.error(response);
             }
@@ -146,7 +213,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
 
                 toast.success(response?.message);
                 setDescription("");
-                setIsModalOpen(false);
+                closeAddOrEditModal();
             } else {
                 toast.error(response);
             }
@@ -166,12 +233,6 @@ const BlogList = ({ blogs, blogCategories, users }) => {
         } else {
             toast.error(response);
         }
-    };
-
-    // open view modal
-    const openViewModal = (item) => {
-        setSelectedItem(item);
-        setIsViewModalOpen(true);
     };
 
     // handle select all
@@ -209,6 +270,11 @@ const BlogList = ({ blogs, blogCategories, users }) => {
         }
     };
 
+    // for remove exixting items
+    const removeExixtingItems = () => {
+        setSelectedItem(null);
+    };
+
     return (
         <div>
             <div>
@@ -217,7 +283,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
             </div>
 
             <div>
-                {/* search Bar */}
+                {/* search bar */}
                 <div>
                     <input
                         type="search"
@@ -232,6 +298,53 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                     />
                 </div>
 
+                {/* search by date time range */}
+                <form onSubmit={handleSearchByDate}>
+                    <div>
+                        <label htmlFor="startDate" className="">
+                            Start Date
+                        </label>
+
+                        <input
+                            type="datetime-local"
+                            name="startDate"
+                            id="startDate"
+                            autoComplete="off"
+                            className=""
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="endDate" className="">
+                            End Date
+                        </label>
+                        <input
+                            type="datetime-local"
+                            name="endDate"
+                            id="endDate"
+                            autoComplete="off"
+                            className=""
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <button type="submit">Search by Date</button>
+                    </div>
+
+                    <div>
+                        <button type="button" onClick={resetDateFilter}>
+                            Reset Date Time
+                        </button>
+                    </div>
+                </form>
+
+                {/* delete selected button */}
                 <div>
                     {selectedItems.length > 0 && (
                         <button type="button" onClick={handleBulkDelete}>
@@ -242,27 +355,27 @@ const BlogList = ({ blogs, blogCategories, users }) => {
 
                 {/* add item button */}
                 <div>
-                    <button type="button" onClick={() => openModal()}>
+                    <button type="button" onClick={() => openAddOrEditModal()}>
                         {loading ? <Spinner /> : <span>Add New</span>}
                     </button>
-
-                    {/* download csv button */}
-                    <DownloadCSVButton
-                        data={blogs}
-                        filename="blogs.csv"
-                        selectedColumns={[
-                            "_id",
-                            "title",
-                            "slug",
-                            "category_name",
-                            "thumbnail",
-                            "coverImage",
-                            "createdBy_fullName",
-                            "createdAt",
-                            "updatedAt",
-                        ]}
-                    />
                 </div>
+
+                {/* download csv button */}
+                <DownloadCSVButton
+                    data={blogs}
+                    filename="blogs.csv"
+                    selectedColumns={[
+                        "_id",
+                        "title",
+                        "slug",
+                        "category_name",
+                        "thumbnail",
+                        "coverImage",
+                        "createdBy_fullName",
+                        "createdAt",
+                        "updatedAt",
+                    ]}
+                />
             </div>
 
             {/* table */}
@@ -333,9 +446,10 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                     <td>
                                         <Image
                                             src={item?.thumbnail}
-                                            alt=""
-                                            height={100}
+                                            className=""
                                             width={100}
+                                            height={100}
+                                            alt=""
                                             style={{
                                                 objectFit: "cover",
                                                 width: "100px",
@@ -367,11 +481,17 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                     <td>{formatDateTime(item?.updatedAt)}</td>
 
                                     <td className="p-[18px] relative">
-                                        <button onClick={() => openModal(item)}>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                openAddOrEditModal(item)
+                                            }
+                                        >
                                             <Edit className="w-4 h-4" />
                                         </button>
 
                                         <button
+                                            type="button"
                                             onClick={() =>
                                                 openDeleteModal(item)
                                             }
@@ -386,11 +506,11 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                 </table>
             </div>
 
-            {/* add / edit modal */}
+            {/* add or edit modal */}
             <Modal
                 title={selectedItem ? "Edit Blog" : "Add New Blog"}
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                isOpen={isAddOrEditModalOpen}
+                onClose={closeAddOrEditModal}
                 width="max-w-4xl"
             >
                 <div>
@@ -539,7 +659,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
             <Modal
                 title="Permanently Delete"
                 isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
+                onClose={closeDeleteModal}
                 width="max-w-md"
             >
                 <div>
@@ -548,10 +668,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                         {selectedItem?.title} ?
                     </p>
 
-                    <button
-                        type="button"
-                        onClick={() => setIsDeleteModalOpen(false)}
-                    >
+                    <button type="button" onClick={closeDeleteModal}>
                         Cancel
                     </button>
 
@@ -565,7 +682,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
             <Modal
                 title="Blog Details"
                 isOpen={isViewModalOpen}
-                onClose={() => setIsViewModalOpen(false)}
+                onClose={closeViewModal}
                 width="max-w-4xl"
             >
                 {selectedItem && (

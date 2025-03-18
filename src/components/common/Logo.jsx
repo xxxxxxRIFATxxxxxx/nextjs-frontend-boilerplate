@@ -5,7 +5,13 @@ import logo from "../../../public/images/logos/logo.png";
 const Logo = ({ width, height }) => {
     return (
         <Link href="/">
-            <Image src={logo} alt="Logo" width={width} height={height} />
+            <Image
+                src={logo}
+                className=""
+                width={width}
+                height={height}
+                alt="Logo"
+            />
         </Link>
     );
 };
