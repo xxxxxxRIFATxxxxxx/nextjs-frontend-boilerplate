@@ -57,16 +57,15 @@ export const AuthProvider = ({ children }) => {
     };
 
     const fetchUser = async (userId) => {
-        setLoading(true);
-
         try {
+            setLoading(true);
+
             const response = await axios.get(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}`,
                 { headers: getAuthHeaders() }
             );
 
             setUser(response.data.data);
-
             return response.data;
         } catch (error) {
             logout();
@@ -75,7 +74,7 @@ export const AuthProvider = ({ children }) => {
                 error?.response?.data?.error ||
                 error?.response?.data ||
                 error?.message ||
-                error
+                "An unexpected error occurred. Please try again later."
             );
         } finally {
             setLoading(false);
@@ -102,7 +101,7 @@ export const AuthProvider = ({ children }) => {
                 error?.response?.data?.error ||
                 error?.response?.data ||
                 error?.message ||
-                error
+                "An unexpected error occurred. Please try again later."
             );
         }
     };
@@ -127,7 +126,7 @@ export const AuthProvider = ({ children }) => {
                 error?.response?.data?.error ||
                 error?.response?.data ||
                 error?.message ||
-                error
+                "An unexpected error occurred. Please try again later."
             );
         }
     };
@@ -148,7 +147,7 @@ export const AuthProvider = ({ children }) => {
                 error?.response?.data?.error ||
                 error?.response?.data ||
                 error?.message ||
-                error
+                "An unexpected error occurred. Please try again later."
             );
         }
     };
@@ -166,7 +165,7 @@ export const AuthProvider = ({ children }) => {
                 error?.response?.data?.error ||
                 error?.response?.data ||
                 error?.message ||
-                error
+                "An unexpected error occurred. Please try again later."
             );
         }
     };
@@ -184,7 +183,7 @@ export const AuthProvider = ({ children }) => {
                 error?.response?.data?.error ||
                 error?.response?.data ||
                 error?.message ||
-                error
+                "An unexpected error occurred. Please try again later."
             );
         }
     };

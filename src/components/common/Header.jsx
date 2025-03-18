@@ -41,7 +41,7 @@ const Header = () => {
 
             <div className="bg-gray-100 p-4 flex items-center justify-center space-x-4 text-center">
                 <Link href="/">Home</Link>
-                <Link href="/">Blogs</Link>
+                <Link href="/blogs">Blogs</Link>
                 {user ? (
                     <button onClick={logout}>Logout</button>
                 ) : (

@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
-import FullPageSpinner from "./FullPageSpinner";
+import FullPageSpinner from "@/components/common/FullPageSpinner";
 
 const PublicRoute = ({ children }) => {
     const { user, loading } = useAuth();
@@ -15,6 +15,7 @@ const PublicRoute = ({ children }) => {
     }, [user, loading, router]);
 
     if (loading) return <FullPageSpinner />;
+
     return !user ? children : null;
 };
 

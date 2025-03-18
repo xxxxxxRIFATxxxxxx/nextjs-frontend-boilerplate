@@ -1,14 +1,11 @@
 import Cookies from "js-cookie";
 
-const getAuthHeaders = (isFormData = false) => {
+const getAuthHeaders = () => {
     const token = Cookies.get(`${process.env.NEXT_PUBLIC_APP_NAME}_token`);
-    const headers = { Authorization: `Bearer ${token}` };
-
-    if (!isFormData) {
-        headers["Content-Type"] = "application/json";
-    }
-
-    return headers;
+    return {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+    };
 };
 
 export default getAuthHeaders;
