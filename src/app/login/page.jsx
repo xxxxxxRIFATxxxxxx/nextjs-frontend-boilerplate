@@ -23,11 +23,11 @@ const Login = () => {
         if (response?.data) {
             toast.success(response.message);
 
-            // reset form fields after successful signup
+            // reset form fields
             setEmailOrPhoneOrUsername("");
             setPassword("");
         } else {
-            toast.error(response?.message || response);
+            toast.error(response);
         }
 
         setLoading(false);
@@ -62,7 +62,6 @@ const Login = () => {
                                 required
                             />
                         </div>
-
                         <div>
                             <label htmlFor="password" className="">
                                 Password
@@ -79,14 +78,15 @@ const Login = () => {
                                 required
                             />
                         </div>
-
                         <button type="submit" className="" disabled={loading}>
-                            {loading ? (
-                                <Spinner />
-                            ) : (
-                                <span>Create an account</span>
-                            )}
+                            {loading ? <Spinner /> : <span>Login</span>}
                         </button>
+
+                        <div>
+                            <Link href="/forgot-password" className="">
+                                Forgot password?
+                            </Link>
+                        </div>
 
                         <p className="">
                             Don’t have an account yet?{" "}

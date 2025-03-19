@@ -1,6 +1,6 @@
 import Layout from "@/components/common/Layout";
 
-const Home = () => {
+const Home = async () => {
     return (
         <Layout>
             <section className="h-screen">Home</section>

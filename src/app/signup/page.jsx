@@ -40,7 +40,7 @@ const Signup = () => {
         if (response?.data) {
             toast.success(response.message);
 
-            // reset form fields after successful signup
+            // reset form fields
             setFullName("");
             setEmail("");
             setPhone("");
@@ -48,7 +48,7 @@ const Signup = () => {
             setPassword("");
             setAcceptedTerms(false);
         } else {
-            toast.error(response?.message || response);
+            toast.error(response);
         }
 
         setLoading(false);
