@@ -47,7 +47,7 @@ const Header = () => {
                 ) : (
                     <Link href="/login">Login</Link>
                 )}
-                {user && <span>{user?.fullName}</span>}
+                {user && <Link href="/profile">{user?.fullName}</Link>}
             </div>
         </header>
     );

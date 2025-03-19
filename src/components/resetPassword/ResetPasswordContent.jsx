@@ -58,8 +58,8 @@ const ResetPasswordContent = () => {
                             name="newPassword"
                             id="newPassword"
                             autoComplete="new-password"
-                            placeholder="••••••••"
                             className=""
+                            placeholder="••••••••"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
@@ -76,8 +76,8 @@ const ResetPasswordContent = () => {
                             name="confirmPassword"
                             id="confirmPassword"
                             autoComplete="new-password"
-                            placeholder="••••••••"
                             className=""
+                            placeholder="••••••••"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required

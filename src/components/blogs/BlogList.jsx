@@ -9,6 +9,7 @@ import Modal from "@/components/common/Modal";
 import TextEditor from "@/components/common/TextEditor";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
+import DefaultImage from "@/components/common/DefaultImage";
 import formatDateTime from "@/helpers/formatDateTime";
 import uploadSingleFile from "@/helpers/uploadSingleFile";
 
@@ -29,6 +30,8 @@ const BlogList = ({ blogs, blogCategories, users }) => {
     const [description, setDescription] = useState(
         selectedItem?.description || ""
     );
+    const [thumbnailImage, setThumbnailImage] = useState(null);
+    const [coverImage, setCoverImage] = useState(null);
 
     // search items
     const handleSearch = (e) => {
@@ -120,6 +123,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
     // handle item creation or update
     const handleSave = async (e) => {
         e.preventDefault();
+
         const title = e.target.title.value.trim();
         const category = e.target.category.value.trim();
         const thumbnail = e.target.thumbnail.files[0];
@@ -275,6 +279,22 @@ const BlogList = ({ blogs, blogCategories, users }) => {
         setSelectedItem(null);
     };
 
+    // for preview thumbnail image
+    const handleThumbnailImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setThumbnailImage(file);
+        }
+    };
+
+    // for preview cover image
+    const handleCoverImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setCoverImage(file);
+        }
+    };
+
     return (
         <div>
             <div>
@@ -356,7 +376,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                 {/* add item button */}
                 <div>
                     <button type="button" onClick={() => openAddOrEditModal()}>
-                        {loading ? <Spinner /> : <span>Add New</span>}
+                        Add New
                     </button>
                 </div>
 
@@ -398,6 +418,8 @@ const BlogList = ({ blogs, blogCategories, users }) => {
 
                             <th>Thumbnail</th>
 
+                            <th>Id</th>
+
                             <th>Title</th>
 
                             <th>Slug</th>
@@ -419,7 +441,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                     <tbody>
                         {filteredItems.length === 0 ? (
                             <tr>
-                                <td colSpan="9" className="text-center">
+                                <td colSpan="12" className="text-center">
                                     No blogs found
                                 </td>
                             </tr>
@@ -446,17 +468,21 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                     <td>
                                         <Image
                                             src={item?.thumbnail}
-                                            className=""
+                                            className="w-auto h-auto object-cover"
                                             width={100}
                                             height={100}
-                                            alt=""
-                                            style={{
-                                                objectFit: "cover",
-                                                width: "100px",
-                                                height: "100px",
-                                            }}
+                                            alt="thumbnail"
                                             priority
                                         />
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            className="hover:underline cursor-pointer"
+                                            onClick={() => openViewModal(item)}
+                                        >
+                                            {item?._id}
+                                        </span>
                                     </td>
 
                                     <td>
@@ -590,12 +616,35 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                 Thumbnail
                             </label>
 
+                            {thumbnailImage || selectedItem?.thumbnail ? (
+                                <Image
+                                    src={
+                                        thumbnailImage
+                                            ? URL.createObjectURL(
+                                                  thumbnailImage
+                                              )
+                                            : selectedItem?.thumbnail
+                                    }
+                                    className="w-full"
+                                    width={1000}
+                                    height={1000}
+                                    alt="thumbnail image"
+                                />
+                            ) : (
+                                <DefaultImage
+                                    width="w-full"
+                                    height="h-[400px]"
+                                    iconSize={100}
+                                />
+                            )}
+
                             <input
                                 type="file"
                                 name="thumbnail"
                                 id="thumbnail"
                                 className=""
                                 accept="image/*"
+                                onChange={handleThumbnailImageChange}
                             />
                         </div>
 
@@ -604,12 +653,33 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                 Cover Image
                             </label>
 
+                            {coverImage || selectedItem?.coverImage ? (
+                                <Image
+                                    src={
+                                        coverImage
+                                            ? URL.createObjectURL(coverImage)
+                                            : selectedItem?.coverImage
+                                    }
+                                    className="w-full"
+                                    width={1000}
+                                    height={1000}
+                                    alt="cover image"
+                                />
+                            ) : (
+                                <DefaultImage
+                                    width="w-full"
+                                    height="h-[400px]"
+                                    iconSize={100}
+                                />
+                            )}
+
                             <input
                                 type="file"
                                 name="coverImage"
                                 id="coverImage"
                                 className=""
                                 accept="image/*"
+                                onChange={handleCoverImageChange}
                             />
                         </div>
 
@@ -644,11 +714,13 @@ const BlogList = ({ blogs, blogCategories, users }) => {
 
                         <div>
                             <button type="submit">
-                                {loading
-                                    ? "Saving..."
-                                    : selectedItem
-                                    ? "Update"
-                                    : "Publish"}
+                                {loading ? (
+                                    <Spinner />
+                                ) : selectedItem ? (
+                                    <span>Update</span>
+                                ) : (
+                                    <span>Publish</span>
+                                )}
                             </button>
                         </div>
                     </form>
@@ -694,7 +766,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                 className="w-auto h-auto"
                                 width={500}
                                 height={500}
-                                alt="Item Image"
+                                alt="thumbnail"
                             />
                         </div>
 
@@ -706,7 +778,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                 className="w-auto h-auto"
                                 width={500}
                                 height={500}
-                                alt="Item Image"
+                                alt="cover image"
                             />
                         </div>
 

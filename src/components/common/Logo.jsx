@@ -10,7 +10,7 @@ const Logo = ({ width, height }) => {
                 className=""
                 width={width}
                 height={height}
-                alt="Logo"
+                alt="logo"
             />
         </Link>
     );

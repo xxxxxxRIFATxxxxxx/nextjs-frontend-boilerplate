@@ -4,7 +4,6 @@ const Modal = ({ title, isOpen, onClose, width = "max-w-md", children }) => {
     return (
         <div
             tabIndex="-1"
-            aria-hidden="true"
             className="overflow-y-auto overflow-x-hidden fixed top-0 bottom-0 right-0 left-0 m-auto z-50 justify-center items-center w-full md:inset-0 max-h-full"
             style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
         >
