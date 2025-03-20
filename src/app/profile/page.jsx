@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import Layout from "@/components/common/Layout";
@@ -16,6 +16,7 @@ const Profile = () => {
     const { user, updateProfile } = useAuth();
     const [loading, setLoading] = useState(false);
     const [userImage, setUserImage] = useState(null);
+    const userImageRef = useRef(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [bio, setBio] = useState(user?.bio || null);
 
@@ -317,16 +318,22 @@ const Profile = () => {
                                                       )
                                                     : user?.image
                                             }
-                                            className="w-[200px] h-[200px] object-cover rounded-full"
+                                            className="w-[200px] h-[200px] object-cover rounded-full cursor-pointer"
                                             width={200}
                                             height={200}
                                             alt="user image"
+                                            onClick={() =>
+                                                userImageRef.current.click()
+                                            }
                                         />
                                     ) : (
                                         <DefaultUserIcon
                                             width="w-[200px]"
                                             height="h-[200px]"
                                             iconSize={100}
+                                            onClick={() =>
+                                                userImageRef.current.click()
+                                            }
                                         />
                                     )}
 
@@ -337,6 +344,7 @@ const Profile = () => {
                                         className=""
                                         accept="image/*"
                                         onChange={handleUserImageChange}
+                                        ref={userImageRef}
                                     />
                                 </div>
 

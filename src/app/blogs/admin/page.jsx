@@ -4,7 +4,7 @@ import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
 import fetchData from "@/helpers/fetchData";
 
-const Blog = async () => {
+const Admin = async () => {
     const blogsResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`
     );
@@ -58,4 +58,4 @@ const Blog = async () => {
     );
 };
 
-export default Blog;
+export default Admin;

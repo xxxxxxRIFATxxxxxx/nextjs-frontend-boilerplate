@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -32,6 +32,8 @@ const BlogList = ({ blogs, blogCategories, users }) => {
     );
     const [thumbnailImage, setThumbnailImage] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
+    const thumbnailImageRef = useRef(null);
+    const coverImageRef = useRef(null);
 
     // search items
     const handleSearch = (e) => {
@@ -41,19 +43,20 @@ const BlogList = ({ blogs, blogCategories, users }) => {
         setFilteredItems(
             blogs.filter((item) => {
                 return (
-                    (item.title?.toLowerCase().includes(value) ?? false) ||
-                    (item.category?.name?.toLowerCase().includes(value) ??
+                    (item?.title?.toLowerCase().includes(value) ?? false) ||
+                    (item?.category?.name?.toLowerCase().includes(value) ??
                         false) ||
-                    (item.status?.toLowerCase().includes(value) ?? false) ||
-                    (item.createdBy?.fullName?.toLowerCase().includes(value) ??
+                    (item._id?.toString().includes(value) ?? false) ||
+                    (item?.status?.toLowerCase().includes(value) ?? false) ||
+                    (item?.createdBy?.fullName?.toLowerCase().includes(value) ??
                         false) ||
-                    (item.createdBy?.email?.toLowerCase().includes(value) ??
+                    (item?.createdBy?.email?.toLowerCase().includes(value) ??
                         false) ||
-                    (item.createdBy?.phone?.toLowerCase().includes(value) ??
+                    (item?.createdBy?.phone?.toLowerCase().includes(value) ??
                         false) ||
-                    (item.createdBy?.username?.toLowerCase().includes(value) ??
+                    (item?.createdBy?.username?.toLowerCase().includes(value) ??
                         false) ||
-                    (item.createdBy?.role?.toLowerCase().includes(value) ??
+                    (item?.createdBy?.role?.toLowerCase().includes(value) ??
                         false)
                 );
             })
@@ -629,12 +632,18 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                     width={1000}
                                     height={1000}
                                     alt="thumbnail image"
+                                    onClick={() =>
+                                        thumbnailImageRef.current.click()
+                                    }
                                 />
                             ) : (
                                 <DefaultImage
                                     width="w-full"
                                     height="h-[400px]"
                                     iconSize={100}
+                                    onClick={() =>
+                                        thumbnailImageRef.current.click()
+                                    }
                                 />
                             )}
 
@@ -645,6 +654,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                 className=""
                                 accept="image/*"
                                 onChange={handleThumbnailImageChange}
+                                ref={thumbnailImageRef}
                             />
                         </div>
 
@@ -664,12 +674,18 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                     width={1000}
                                     height={1000}
                                     alt="cover image"
+                                    onClick={() =>
+                                        coverImageRef.current.click()
+                                    }
                                 />
                             ) : (
                                 <DefaultImage
                                     width="w-full"
                                     height="h-[400px]"
                                     iconSize={100}
+                                    onClick={() =>
+                                        coverImageRef.current.click()
+                                    }
                                 />
                             )}
 
@@ -680,6 +696,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                 className=""
                                 accept="image/*"
                                 onChange={handleCoverImageChange}
+                                ref={coverImageRef}
                             />
                         </div>
 
@@ -761,6 +778,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                     <div>
                         <div>
                             <h2>Thumbnail</h2>
+
                             <Image
                                 src={selectedItem?.thumbnail}
                                 className="w-auto h-auto"
