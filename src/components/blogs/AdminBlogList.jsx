@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -13,8 +13,10 @@ import DefaultImage from "@/components/common/DefaultImage";
 import formatDateTime from "@/helpers/formatDateTime";
 import uploadSingleFile from "@/helpers/uploadSingleFile";
 
-const BlogList = ({ blogs, blogCategories, users }) => {
+const AdminBlogList = ({ blogs, blogCategories, users }) => {
     const [search, setSearch] = useState("");
+    const [sortBy, setSortBy] = useState("oldest");
+    const [itemStatus, setItemStatus] = useState("all");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [filteredItems, setFilteredItems] = useState(blogs);
@@ -35,56 +37,10 @@ const BlogList = ({ blogs, blogCategories, users }) => {
     const thumbnailImageRef = useRef(null);
     const coverImageRef = useRef(null);
 
-    // search items
-    const handleSearch = (e) => {
-        const value = e.target.value.toLowerCase();
-        setSearch(value);
-
-        setFilteredItems(
-            blogs.filter((item) => {
-                return (
-                    (item?.title?.toLowerCase().includes(value) ?? false) ||
-                    (item?.category?.name?.toLowerCase().includes(value) ??
-                        false) ||
-                    (item._id?.toString().includes(value) ?? false) ||
-                    (item?.status?.toLowerCase().includes(value) ?? false) ||
-                    (item?.createdBy?.fullName?.toLowerCase().includes(value) ??
-                        false) ||
-                    (item?.createdBy?.email?.toLowerCase().includes(value) ??
-                        false) ||
-                    (item?.createdBy?.phone?.toLowerCase().includes(value) ??
-                        false) ||
-                    (item?.createdBy?.username?.toLowerCase().includes(value) ??
-                        false) ||
-                    (item?.createdBy?.role?.toLowerCase().includes(value) ??
-                        false)
-                );
-            })
-        );
-    };
-
-    // search by date
-    const handleSearchByDate = (e) => {
-        e.preventDefault();
-
-        if (!startDate || !endDate) return;
-
-        const filtered = blogs.filter((item) => {
-            const blogDate = new Date(item.createdAt).getTime();
-            return (
-                blogDate >= new Date(startDate).getTime() &&
-                blogDate <= new Date(endDate).getTime()
-            );
-        });
-
-        setFilteredItems(filtered);
-    };
-
-    // reset date filter
+    // reset date time range filter
     const resetDateFilter = () => {
         setStartDate("");
         setEndDate("");
-        setFilteredItems(blogs);
     };
 
     // open modal for add or edit
@@ -298,6 +254,60 @@ const BlogList = ({ blogs, blogCategories, users }) => {
         }
     };
 
+    // filtering logic
+    useEffect(() => {
+        let filtered = [...blogs];
+
+        // search
+        if (search) {
+            const searchLower = search.toLowerCase();
+            filtered = filtered.filter((item) =>
+                [
+                    item?.title,
+                    item?.category?.name,
+                    item?._id?.toString(),
+                    item?.status,
+                    item?.createdBy?.fullName,
+                    item?.createdBy?.email,
+                    item?.createdBy?.phone,
+                    item?.createdBy?.username,
+                    item?.createdBy?.role,
+                ]
+                    .map((field) => field?.toLowerCase() ?? "")
+                    .some((field) => field?.includes(searchLower))
+            );
+        }
+
+        // sort by newest or oldest
+        if (sortBy === "newest") {
+            filtered.sort(
+                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+        } else if (sortBy === "oldest") {
+            filtered.sort(
+                (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+            );
+        }
+
+        // filter by status
+        if (itemStatus !== "all") {
+            filtered = filtered.filter((item) => item.status === itemStatus);
+        }
+
+        // search by date time range
+        if (startDate && endDate) {
+            filtered = filtered.filter((item) => {
+                const blogDate = new Date(item?.createdAt).getTime();
+                return (
+                    blogDate >= new Date(startDate).getTime() &&
+                    blogDate <= new Date(endDate).getTime()
+                );
+            });
+        }
+
+        setFilteredItems(filtered);
+    }, [search, sortBy, itemStatus, startDate, endDate, blogs]);
+
     return (
         <div>
             <div>
@@ -308,6 +318,10 @@ const BlogList = ({ blogs, blogCategories, users }) => {
             <div>
                 {/* search bar */}
                 <div>
+                    <label htmlFor="search" className="">
+                        Search
+                    </label>
+
                     <input
                         type="search"
                         name="search"
@@ -316,34 +330,70 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                         className=""
                         placeholder="Search blogs..."
                         value={search}
-                        onChange={handleSearch}
-                        required
+                        onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
 
-                {/* search by date time range */}
-                <form onSubmit={handleSearchByDate}>
-                    <div>
-                        <label htmlFor="startDate" className="">
-                            Start Date
-                        </label>
+                {/* sort by newest or oldest */}
+                <div>
+                    <label htmlFor="sortBy" className="">
+                        Sort by
+                    </label>
 
-                        <input
-                            type="datetime-local"
-                            name="startDate"
-                            id="startDate"
-                            autoComplete="off"
-                            className=""
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <select
+                        name="sortBy"
+                        id="sortBy"
+                        className=""
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                    >
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                    </select>
+                </div>
 
-                    <div>
+                {/* filter by status */}
+                <div>
+                    <label htmlFor="status" className="">
+                        Status
+                    </label>
+
+                    <select
+                        name="status"
+                        id="status"
+                        className=""
+                        value={itemStatus}
+                        onChange={(e) => setItemStatus(e.target.value)}
+                    >
+                        <option value="all">All</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                {/* search by date time rang */}
+                <div>
+                    <form onSubmit={(e) => e.preventDefault()}>
+                        <div>
+                            <label htmlFor="startDate" className="">
+                                Start Date
+                            </label>
+
+                            <input
+                                type="datetime-local"
+                                name="startDate"
+                                id="startDate"
+                                autoComplete="off"
+                                className=""
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                            />
+                        </div>
+
                         <label htmlFor="endDate" className="">
                             End Date
                         </label>
+
                         <input
                             type="datetime-local"
                             name="endDate"
@@ -352,20 +402,15 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                             className=""
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            required
                         />
-                    </div>
 
-                    <div>
-                        <button type="submit">Search by Date</button>
-                    </div>
-
-                    <div>
-                        <button type="button" onClick={resetDateFilter}>
-                            Reset Date Time
-                        </button>
-                    </div>
-                </form>
+                        <div>
+                            <button type="button" onClick={resetDateFilter}>
+                                Reset Date Time
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
                 {/* delete selected button */}
                 <div>
@@ -445,7 +490,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                         {filteredItems.length === 0 ? (
                             <tr>
                                 <td colSpan="12" className="text-center">
-                                    No blogs found
+                                    No blogs found.
                                 </td>
                             </tr>
                         ) : (
@@ -570,7 +615,7 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                 name="category"
                                 id="category"
                                 className=""
-                                defaultValue={selectedItem?.category._id || ""}
+                                defaultValue={selectedItem?.category?._id || ""}
                                 required
                             >
                                 <option value="" disabled>
@@ -579,10 +624,10 @@ const BlogList = ({ blogs, blogCategories, users }) => {
 
                                 {blogCategories?.map((blogCategory) => (
                                     <option
-                                        key={blogCategory._id}
-                                        value={blogCategory._id}
+                                        key={blogCategory?._id}
+                                        value={blogCategory?._id}
                                     >
-                                        {blogCategory.name}
+                                        {blogCategory?.name}
                                     </option>
                                 ))}
                             </select>
@@ -607,8 +652,8 @@ const BlogList = ({ blogs, blogCategories, users }) => {
                                 </option>
 
                                 {users?.map((user) => (
-                                    <option key={user._id} value={user._id}>
-                                        {user.fullName}
+                                    <option key={user?._id} value={user?._id}>
+                                        {user?.fullName}
                                     </option>
                                 ))}
                             </select>
@@ -840,4 +885,4 @@ const BlogList = ({ blogs, blogCategories, users }) => {
     );
 };
 
-export default BlogList;
+export default AdminBlogList;

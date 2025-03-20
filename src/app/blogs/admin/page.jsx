@@ -1,5 +1,5 @@
 import Layout from "@/components/common/Layout";
-import BlogList from "@/components/blogs/BlogList";
+import AdminBlogList from "@/components/blogs/AdminBlogList";
 import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
 import fetchData from "@/helpers/fetchData";
@@ -46,7 +46,7 @@ const Admin = async () => {
 
                 {!blogsError && !blogCategoriesError && !usersError && (
                     <section>
-                        <BlogList
+                        <AdminBlogList
                             blogs={blogs}
                             blogCategories={blogCategories}
                             users={users}

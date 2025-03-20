@@ -1,5 +1,5 @@
 import Layout from "@/components/common/Layout";
-import BlogList from "@/components/blogs/BlogList";
+import UserBlogList from "@/components/blogs/UserBlogList";
 import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
 import fetchData from "@/helpers/fetchData";
@@ -18,9 +18,17 @@ const Blog = async () => {
     );
 
     // extract data or error messages
-    const blogs = blogsResponse?.data || [];
-    const blogCategories = blogCategoriesResponse?.data || [];
-    const users = usersResponse?.data || [];
+    const blogs = (blogsResponse?.data || []).filter(
+        (item) => item?.status === "active"
+    );
+
+    const blogCategories = (blogCategoriesResponse?.data || []).filter(
+        (category) => category?.status === "active"
+    );
+
+    const users = (usersResponse?.data || []).filter(
+        (user) => user?.status === "active"
+    );
 
     const blogsError = blogsResponse?.error || null;
     const blogCategoriesError = blogCategoriesResponse?.error || null;
@@ -46,7 +54,7 @@ const Blog = async () => {
 
                 {!blogsError && !blogCategoriesError && !usersError && (
                     <section>
-                        <BlogList
+                        <UserBlogList
                             blogs={blogs}
                             blogCategories={blogCategories}
                             users={users}
