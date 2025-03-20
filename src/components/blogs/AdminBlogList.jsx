@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { io } from "socket.io-client";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import useCrud from "@/hooks/useCrud";
 import Modal from "@/components/common/Modal";
 import TextEditor from "@/components/common/TextEditor";
@@ -12,8 +12,19 @@ import Spinner from "@/components/common/Spinner";
 import DefaultImage from "@/components/common/DefaultImage";
 import formatDateTime from "@/helpers/formatDateTime";
 import uploadSingleFile from "@/helpers/uploadSingleFile";
+import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const AdminBlogList = ({ blogs, blogCategories, users }) => {
+const socket = io(process.env.NEXT_PUBLIC_API_URL);
+
+const AdminBlogList = ({
+    initialBlogs,
+    initialBlogCategories,
+    initialUsers,
+}) => {
+    const [blogs, setBlogs] = useState(initialBlogs);
+    const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
+    const [users, setUsers] = useState(initialUsers);
+
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState("oldest");
     const [itemStatus, setItemStatus] = useState("all");
@@ -29,13 +40,55 @@ const AdminBlogList = ({ blogs, blogCategories, users }) => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
-    const [description, setDescription] = useState(
-        selectedItem?.description || ""
-    );
+    const [description, setDescription] = useState("");
     const [thumbnailImage, setThumbnailImage] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
     const thumbnailImageRef = useRef(null);
     const coverImageRef = useRef(null);
+
+    // fetch updated data when the server sends a real-time update
+    const refreshData = async () => {
+        const updatedBlogsResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`
+        );
+
+        const updatedCategoriesResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
+        );
+
+        const updatedUsersResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+        );
+
+        const updatedBlogs = updatedBlogsResponse?.data || [];
+        const updatedBlogCategories = updatedCategoriesResponse?.data || [];
+        const updatedUsers = updatedUsersResponse?.data || [];
+
+        const updatedBlogsError = updatedBlogsResponse?.error || null;
+        const updatedBlogCategoriesError =
+            updatedCategoriesResponse?.error || null;
+        const updatedUsersError = updatedUsersResponse?.error || null;
+
+        if (
+            updatedBlogsError ||
+            updatedBlogCategoriesError ||
+            updatedUsersError
+        ) {
+            const errorMessage = [
+                updatedBlogsError,
+                updatedBlogCategoriesError,
+                updatedUsersError,
+            ]
+                .filter(Boolean)
+                .join("\n");
+
+            toast.error(errorMessage);
+        } else {
+            setBlogs(updatedBlogs);
+            setBlogCategories(updatedBlogCategories);
+            setUsers(updatedUsers);
+        }
+    };
 
     // reset date time range filter
     const resetDateFilter = () => {
@@ -236,6 +289,8 @@ const AdminBlogList = ({ blogs, blogCategories, users }) => {
     // for remove exixting items
     const removeExixtingItems = () => {
         setSelectedItem(null);
+        setThumbnailImage(null);
+        setCoverImage(null);
     };
 
     // for preview thumbnail image
@@ -307,6 +362,24 @@ const AdminBlogList = ({ blogs, blogCategories, users }) => {
 
         setFilteredItems(filtered);
     }, [search, sortBy, itemStatus, startDate, endDate, blogs]);
+
+    // set description when selectedItem changes
+    useEffect(() => {
+        setDescription(selectedItem?.description || "");
+    }, [selectedItem]);
+
+    // listen for real-time events and update ui
+    useEffect(() => {
+        socket.on("blogsUpdated", refreshData);
+        socket.on("blogcategoriesUpdated", refreshData);
+        socket.on("usersUpdated", refreshData);
+
+        return () => {
+            socket.off("blogsUpdated", refreshData);
+            socket.off("blogcategoriesUpdated", refreshData);
+            socket.off("usersUpdated", refreshData);
+        };
+    }, []);
 
     return (
         <div>

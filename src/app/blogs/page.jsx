@@ -18,15 +18,15 @@ const Blog = async () => {
     );
 
     // extract data or error messages
-    const blogs = (blogsResponse?.data || []).filter(
+    const initialBlogs = (blogsResponse?.data || []).filter(
         (item) => item?.status === "active"
     );
 
-    const blogCategories = (blogCategoriesResponse?.data || []).filter(
+    const initialBlogCategories = (blogCategoriesResponse?.data || []).filter(
         (category) => category?.status === "active"
     );
 
-    const users = (usersResponse?.data || []).filter(
+    const initialUsers = (usersResponse?.data || []).filter(
         (user) => user?.status === "active"
     );
 
@@ -55,9 +55,9 @@ const Blog = async () => {
                 {!blogsError && !blogCategoriesError && !usersError && (
                     <section>
                         <UserBlogList
-                            blogs={blogs}
-                            blogCategories={blogCategories}
-                            users={users}
+                            initialBlogs={initialBlogs}
+                            initialBlogCategories={initialBlogCategories}
+                            initialUsers={initialUsers}
                         />
                     </section>
                 )}

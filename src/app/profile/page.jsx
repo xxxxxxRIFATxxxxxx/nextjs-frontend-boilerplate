@@ -98,8 +98,13 @@ const Profile = () => {
 
     // close modal for edit
     const closeEditModal = () => {
-        setUserImage(null);
+        removeExixtingItems();
         setIsEditModalOpen(false);
+    };
+
+    // for remove exixting items
+    const removeExixtingItems = () => {
+        setUserImage(null);
     };
 
     // for preview user image

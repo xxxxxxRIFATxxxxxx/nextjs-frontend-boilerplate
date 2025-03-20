@@ -17,10 +17,10 @@ const Admin = async () => {
         `${process.env.NEXT_PUBLIC_API_URL}/api/users`
     );
 
-    // extract data or error messages
-    const blogs = blogsResponse?.data || [];
-    const blogCategories = blogCategoriesResponse?.data || [];
-    const users = usersResponse?.data || [];
+    // extract initial data or error messages
+    const initialBlogs = blogsResponse?.data || [];
+    const initialBlogCategories = blogCategoriesResponse?.data || [];
+    const initialUsers = usersResponse?.data || [];
 
     const blogsError = blogsResponse?.error || null;
     const blogCategoriesError = blogCategoriesResponse?.error || null;
@@ -47,9 +47,9 @@ const Admin = async () => {
                 {!blogsError && !blogCategoriesError && !usersError && (
                     <section>
                         <AdminBlogList
-                            blogs={blogs}
-                            blogCategories={blogCategories}
-                            users={users}
+                            initialBlogs={initialBlogs}
+                            initialBlogCategories={initialBlogCategories}
+                            initialUsers={initialUsers}
                         />
                     </section>
                 )}

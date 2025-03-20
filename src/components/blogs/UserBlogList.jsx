@@ -2,10 +2,22 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { io } from "socket.io-client";
 import { useSearchParams } from "next/navigation";
 import formatDateTime from "@/helpers/formatDateTime";
+import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const UserBlogList = ({ blogs, blogCategories, users }) => {
+const socket = io(process.env.NEXT_PUBLIC_API_URL);
+
+const UserBlogList = ({
+    initialBlogs,
+    initialBlogCategories,
+    initialUsers,
+}) => {
+    const [blogs, setBlogs] = useState(initialBlogs);
+    const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
+    const [users, setUsers] = useState(initialUsers);
+
     const searchParams = useSearchParams();
     const initialSearch = searchParams.get("search") || "";
 
@@ -17,6 +29,51 @@ const UserBlogList = ({ blogs, blogCategories, users }) => {
     const [endDate, setEndDate] = useState("");
     const [filteredItems, setFilteredItems] = useState([]);
 
+    // fetch updated data when the server sends a real-time update
+    const refreshData = async () => {
+        const updatedBlogsResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`
+        );
+
+        const updatedCategoriesResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
+        );
+
+        const updatedUsersResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+        );
+
+        const updatedBlogs = updatedBlogsResponse?.data || [];
+        const updatedBlogCategories = updatedCategoriesResponse?.data || [];
+        const updatedUsers = updatedUsersResponse?.data || [];
+
+        const updatedBlogsError = updatedBlogsResponse?.error || null;
+        const updatedBlogCategoriesError =
+            updatedCategoriesResponse?.error || null;
+        const updatedUsersError = updatedUsersResponse?.error || null;
+
+        if (
+            updatedBlogsError ||
+            updatedBlogCategoriesError ||
+            updatedUsersError
+        ) {
+            const errorMessage = [
+                updatedBlogsError,
+                updatedBlogCategoriesError,
+                updatedUsersError,
+            ]
+                .filter(Boolean)
+                .join("\n");
+
+            toast.error(errorMessage);
+        } else {
+            setBlogs(updatedBlogs);
+            setBlogCategories(updatedBlogCategories);
+            setUsers(updatedUsers);
+        }
+    };
+
+    // reset date time range filter
     const resetDateFilter = () => {
         setStartDate("");
         setEndDate("");
@@ -92,6 +149,19 @@ const UserBlogList = ({ blogs, blogCategories, users }) => {
         endDate,
         blogs,
     ]);
+
+    // listen for real-time events and update ui
+    useEffect(() => {
+        socket.on("blogsUpdated", refreshData);
+        socket.on("blogcategoriesUpdated", refreshData);
+        socket.on("usersUpdated", refreshData);
+
+        return () => {
+            socket.off("blogsUpdated", refreshData);
+            socket.off("blogcategoriesUpdated", refreshData);
+            socket.off("usersUpdated", refreshData);
+        };
+    }, []);
 
     return (
         <div>
