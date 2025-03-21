@@ -295,63 +295,43 @@ const UserBlogList = ({
                 </div>
             </div>
 
-            {/* table */}
-            <div className="overflow-x-auto">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Thumbnail</th>
-                            <th>Title</th>
-                            <th>Category</th>
-                            <th>Created By</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                        </tr>
-                    </thead>
+            {/* blog list */}
+            <div>
+                {filteredItems.length === 0 ? (
+                    <div>No blogs found.</div>
+                ) : (
+                    filteredItems.map((item, index) => (
+                        <div key={item?._id}>
+                            <div>
+                                <Image
+                                    src={item?.thumbnail}
+                                    className="w-auto h-auto object-cover"
+                                    width={100}
+                                    height={100}
+                                    alt="thumbnail"
+                                    priority
+                                />
+                            </div>
 
-                    <tbody>
-                        {filteredItems.length === 0 ? (
-                            <tr>
-                                <td colSpan="7">No blogs found.</td>
-                            </tr>
-                        ) : (
-                            filteredItems.map((item, index) => (
-                                <tr key={item?._id}>
-                                    <td>{index + 1}</td>
+                            <h2>
+                                <Link
+                                    href={`/blogs/${item?.slug}`}
+                                    className="hover:underline"
+                                >
+                                    {item?.title}
+                                </Link>
+                            </h2>
 
-                                    <td>
-                                        <Image
-                                            src={item?.thumbnail}
-                                            className="w-auto h-auto object-cover"
-                                            width={100}
-                                            height={100}
-                                            alt="thumbnail"
-                                            priority
-                                        />
-                                    </td>
+                            <div>{item?.category?.name}</div>
 
-                                    <td>
-                                        <Link
-                                            href={`/blogs/${item?.slug}`}
-                                            className="hover:underline"
-                                        >
-                                            {item?.title}
-                                        </Link>
-                                    </td>
+                            <div>{item?.createdBy?.fullName}</div>
 
-                                    <td>{item?.category?.name}</td>
+                            <div>{formatDateTime(item?.createdAt)}</div>
 
-                                    <td>{item?.createdBy?.fullName}</td>
-
-                                    <td>{formatDateTime(item?.createdAt)}</td>
-
-                                    <td>{formatDateTime(item?.updatedAt)}</td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            <div>{formatDateTime(item?.updatedAt)}</div>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );

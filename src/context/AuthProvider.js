@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import { io } from "socket.io-client";
 import getAuthHeaders from "@/helpers/getAuthHeaders";
 import setAuthCookies from "@/helpers/setAuthCookies";
 import removeAuthCookies from "@/helpers/removeAuthCookies";
 
 const AuthContext = createContext(null);
+const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
 export const AuthProvider = ({ children }) => {
     const router = useRouter();
@@ -38,6 +40,20 @@ export const AuthProvider = ({ children }) => {
 
         return () => clearTimeout(logoutTimer);
     }, []);
+
+    // listen for real-time events and update ui
+    useEffect(() => {
+        socket.on("usersUpdated", async (change) => {
+            if (user && change.documentKey._id === user?._id) {
+                // fetch latest user data if the logged-in user was updated
+                await fetchUser(user?._id);
+            }
+        });
+
+        return () => {
+            socket.off("usersUpdated");
+        };
+    }, [user]);
 
     const decodeToken = (token) => {
         try {

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
+import NotificationTab from "@/components/common/NotificationTab";
 
 const Header = () => {
     const router = useRouter();
@@ -48,6 +49,7 @@ const Header = () => {
                     <Link href="/login">Login</Link>
                 )}
                 {user && <Link href="/profile">{user?.fullName}</Link>}
+                <NotificationTab />
             </div>
         </header>
     );

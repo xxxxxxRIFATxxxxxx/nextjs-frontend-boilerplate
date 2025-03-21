@@ -2,6 +2,7 @@ import { Poppins } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "@/context/AuthProvider";
+import { NotificationProvider } from "@/context/NotificationProvider";
 import "@/styles/globals.css";
 
 const poppins = Poppins({
@@ -31,7 +32,9 @@ export default function RootLayout({ children }) {
 
             <body className={`${poppins.variable}`}>
                 <ToastContainer theme="colored" />
-                <AuthProvider>{children}</AuthProvider>
+                <AuthProvider>
+                    <NotificationProvider>{children}</NotificationProvider>
+                </AuthProvider>
             </body>
         </html>
     );
