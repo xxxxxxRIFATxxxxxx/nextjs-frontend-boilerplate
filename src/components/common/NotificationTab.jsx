@@ -1,25 +1,16 @@
 "use client";
-import { useNotifications } from "@/context/NotificationProvider";
 import { useState, useEffect, useRef } from "react";
+import { toast } from "react-toastify";
 import { Bell } from "lucide-react";
+import { useAuth } from "@/context/AuthProvider";
+import { useNotifications } from "@/context/NotificationProvider";
+import formatDateTime from "@/helpers/formatDateTime";
 
 const NotificationTab = () => {
-    const { notifications, setNotifications } = useNotifications();
+    const { user } = useAuth();
+    const { notifications, markAsSeen } = useNotifications();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
-
-    // mark all notifications as seen when dropdown closes
-    useEffect(() => {
-        if (!isOpen) {
-            setNotifications((prev) =>
-                prev.map((notif) => ({ ...notif, seen: true }))
-            );
-        }
-    }, [isOpen, setNotifications]);
-
-    const handleClearNotifications = () => {
-        setNotifications([]);
-    };
 
     // close dropdown when clicking outside
     useEffect(() => {
@@ -37,8 +28,21 @@ const NotificationTab = () => {
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // count unseen notifications (does not change until dropdown is closed)
-    const unseenCount = notifications.filter((notif) => !notif.seen).length;
+    // mark all unseen notifications as seen when dropdown opens
+    useEffect(() => {
+        if (isOpen) {
+            markAsSeen().then((response) => {
+                if (!response?.message) {
+                    toast.error(response);
+                }
+            });
+        }
+    }, [isOpen]);
+
+    // count unseen notifications
+    const unseenCount = notifications.filter(
+        (notif) => !notif.seenBy.includes(user?._id)
+    ).length;
 
     return (
         <div className="relative" ref={dropdownRef}>
@@ -50,6 +54,7 @@ const NotificationTab = () => {
                 }`}
             >
                 <Bell className="w-6 h-6 text-gray-700" />
+
                 {unseenCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-2">
                         {unseenCount}
@@ -60,14 +65,8 @@ const NotificationTab = () => {
             {/* notification dropdown */}
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-3 z-50">
-                    <div className="flex justify-between items-center mb-2">
+                    <div className="mb-2 flex justify-between items-center">
                         <span className="font-semibold">Notifications</span>
-                        <button
-                            onClick={handleClearNotifications}
-                            className="text-sm text-red-500 hover:underline"
-                        >
-                            Clear All
-                        </button>
                     </div>
 
                     {/* notification list with scroll */}
@@ -75,24 +74,25 @@ const NotificationTab = () => {
                         {notifications.length > 0 ? (
                             notifications.map((notif) => (
                                 <li
-                                    key={notif.id}
+                                    key={notif?._id}
                                     className="relative p-2 bg-gray-100 rounded-lg text-sm flex flex-col"
                                 >
-                                    {/* red dot for unseen notifications */}
-                                    {!notif.seen && (
+                                    {!notif.seenBy.includes(user?._id) && (
                                         <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                                     )}
+
                                     <span className="font-medium">
-                                        {notif.message}
+                                        {notif?.message}
                                     </span>
+
                                     <span className="text-xs text-gray-500">
-                                        {notif.time}
+                                        {formatDateTime(notif?.createdAt)}
                                     </span>
                                 </li>
                             ))
                         ) : (
                             <p className="text-gray-500 text-sm">
-                                No notifications
+                                No notifications.
                             </p>
                         )}
                     </ul>
