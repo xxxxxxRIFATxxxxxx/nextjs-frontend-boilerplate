@@ -88,9 +88,9 @@ const UserBlogList = ({
             const searchLower = search.toLowerCase();
             filtered = filtered.filter((item) =>
                 [
+                    item?._id?.toString(),
                     item?.title,
                     item?.category?.name,
-                    item?._id?.toString(),
                     item?.status,
                     item?.createdBy?.fullName,
                     item?.createdBy?.email,

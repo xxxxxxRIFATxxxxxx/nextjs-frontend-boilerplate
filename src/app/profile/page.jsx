@@ -15,10 +15,10 @@ import uploadSingleFile from "@/helpers/uploadSingleFile";
 const Profile = () => {
     const { user, updateProfile } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [bio, setBio] = useState(user?.bio || null);
     const [userImage, setUserImage] = useState(null);
     const userImageRef = useRef(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [bio, setBio] = useState(user?.bio || null);
 
     // handle profile update
     const handleSave = async (e) => {
@@ -68,10 +68,10 @@ const Profile = () => {
             email,
             phone,
             username,
-            bio,
+            image: imageUrl,
             dateOfBirth,
             address: { street, city, state, zipCode, country },
-            image: imageUrl,
+            bio,
         };
 
         if (newPassword && currentPassword) {
@@ -124,27 +124,27 @@ const Profile = () => {
                     {/* user information */}
                     <div>
                         <div>
-                            <h2>Full Name</h2>
+                            <h2>Full name</h2>
                             <p>{user?.fullName}</p>
                         </div>
 
                         <div>
-                            <h2>Email:</h2>
+                            <h2>Email</h2>
                             <p>{user?.email}</p>
                         </div>
 
                         <div>
-                            <h2>Phone:</h2>
+                            <h2>Phone</h2>
                             <p>{user?.phone}</p>
                         </div>
 
                         <div>
-                            <h2>Username:</h2>
+                            <h2>Username</h2>
                             <p>{user?.username}</p>
                         </div>
 
                         <div>
-                            <h2>Image:</h2>
+                            <h2>Image</h2>
 
                             {user?.image ? (
                                 <Image
@@ -165,14 +165,14 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <h2>Date of birth:</h2>
+                            <h2>Date of birth</h2>
                             {user?.dateOfBirth && (
                                 <p>{formatDate(user?.dateOfBirth)}</p>
                             )}
                         </div>
 
                         <div>
-                            <h2>Address:</h2>
+                            <h2>Address</h2>
                             <p>Street: {user?.address?.street}</p>
                             <p>City: {user?.address?.city}</p>
                             <p>State: {user?.address?.state}</p>
@@ -181,7 +181,7 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <h2>Bio:</h2>
+                            <h2>Bio</h2>
                             <div
                                 dangerouslySetInnerHTML={{
                                     __html: user?.bio,
@@ -375,7 +375,7 @@ const Profile = () => {
                                         className=""
                                         defaultValue={
                                             user?.dateOfBirth
-                                                ? new Date(user.dateOfBirth)
+                                                ? new Date(user?.dateOfBirth)
                                                       .toISOString()
                                                       .split("T")[0]
                                                 : ""

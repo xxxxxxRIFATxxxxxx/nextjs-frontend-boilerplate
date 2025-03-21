@@ -1,38 +1,28 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import useCrud from "@/hooks/useCrud";
 import Modal from "@/components/common/Modal";
-import TextEditor from "@/components/common/TextEditor";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
-import DefaultImage from "@/components/common/DefaultImage";
 import formatDateTime from "@/helpers/formatDateTime";
-import uploadSingleFile from "@/helpers/uploadSingleFile";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
 const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
-const AdminBlogList = ({
-    initialBlogs,
-    initialBlogCategories,
-    initialUsers,
-}) => {
-    const [blogs, setBlogs] = useState(initialBlogs);
+const BlogCategoryList = ({ initialBlogCategories }) => {
     const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
-    const [users, setUsers] = useState(initialUsers);
 
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState("oldest");
     const [itemStatus, setItemStatus] = useState("all");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [filteredItems, setFilteredItems] = useState(blogs);
+    const [filteredItems, setFilteredItems] = useState(blogCategories);
     const { createItem, updateItem, deleteItem, deleteMultipleItems, loading } =
-        useCrud("blogs");
+        useCrud("blogCategories");
 
     const [isAddOrEditModalOpen, setIsAddOrEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,53 +30,26 @@ const AdminBlogList = ({
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
-    const [description, setDescription] = useState("");
-    const [thumbnailImage, setThumbnailImage] = useState(null);
-    const [coverImage, setCoverImage] = useState(null);
-    const thumbnailImageRef = useRef(null);
-    const coverImageRef = useRef(null);
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
-        const updatedBlogsResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`
-        );
-
         const updatedCategoriesResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
         );
 
-        const updatedUsersResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/users`
-        );
-
-        const updatedBlogs = updatedBlogsResponse?.data || [];
         const updatedBlogCategories = updatedCategoriesResponse?.data || [];
-        const updatedUsers = updatedUsersResponse?.data || [];
 
-        const updatedBlogsError = updatedBlogsResponse?.error || null;
         const updatedBlogCategoriesError =
             updatedCategoriesResponse?.error || null;
-        const updatedUsersError = updatedUsersResponse?.error || null;
 
-        if (
-            updatedBlogsError ||
-            updatedBlogCategoriesError ||
-            updatedUsersError
-        ) {
-            const errorMessage = [
-                updatedBlogsError,
-                updatedBlogCategoriesError,
-                updatedUsersError,
-            ]
+        if (updatedBlogCategoriesError) {
+            const errorMessage = [updatedBlogCategoriesError]
                 .filter(Boolean)
                 .join("\n");
 
             toast.error(errorMessage);
         } else {
-            setBlogs(updatedBlogs);
             setBlogCategories(updatedBlogCategories);
-            setUsers(updatedUsers);
         }
     };
 
@@ -136,45 +99,12 @@ const AdminBlogList = ({
     const handleSave = async (e) => {
         e.preventDefault();
 
-        const title = e.target.title.value.trim();
-        const category = e.target.category.value.trim();
-        const thumbnail = e.target.thumbnail.files[0];
-        const coverImage = e.target.coverImage.files[0];
-        const createdBy = e.target.createdBy.value.trim();
+        const name = e.target.name.value.trim();
         const status = e.target.status.value.trim();
-
-        let thumbnailUrl = selectedItem?.thumbnail;
-
-        if (thumbnail) {
-            const responseFile = await uploadSingleFile(thumbnail);
-
-            if (responseFile?.error) {
-                return toast.error(responseFile.error);
-            } else {
-                thumbnailUrl = responseFile.data.fileUrl;
-            }
-        }
-
-        let coverImageUrl = selectedItem?.coverImage;
-
-        if (coverImage) {
-            const responseFile = await uploadSingleFile(coverImage);
-
-            if (responseFile?.error) {
-                return toast.error(responseFile.error);
-            } else {
-                coverImageUrl = responseFile.data.fileUrl;
-            }
-        }
 
         if (selectedItem) {
             const response = await updateItem(selectedItem._id, {
-                title,
-                description,
-                category,
-                thumbnail: thumbnailUrl,
-                coverImage: coverImageUrl,
-                createdBy,
+                name,
                 status,
             });
 
@@ -186,30 +116,18 @@ const AdminBlogList = ({
                         item._id === selectedItem._id
                             ? {
                                   ...updatedItem,
-                                  category: blogCategories.find(
-                                      (blogCat) => blogCat._id === category
-                                  ),
-                                  createdBy: users.find(
-                                      (user) => user._id === createdBy
-                                  ),
                               }
                             : item
                     )
                 );
                 toast.success(response?.message);
-                setDescription("");
                 closeAddOrEditModal();
             } else {
                 toast.error(response);
             }
         } else {
             const response = await createItem({
-                title,
-                description,
-                category,
-                thumbnail: thumbnailUrl,
-                coverImage: coverImageUrl,
-                createdBy,
+                name,
                 status,
             });
 
@@ -220,15 +138,10 @@ const AdminBlogList = ({
                     ...prev,
                     {
                         ...newItem,
-                        category: blogCategories.find(
-                            (blogCat) => blogCat._id === category
-                        ),
-                        createdBy: users.find((user) => user._id === createdBy),
                     },
                 ]);
 
                 toast.success(response?.message);
-                setDescription("");
                 closeAddOrEditModal();
             } else {
                 toast.error(response);
@@ -289,45 +202,17 @@ const AdminBlogList = ({
     // for remove exixting items
     const removeExixtingItems = () => {
         setSelectedItem(null);
-        setThumbnailImage(null);
-        setCoverImage(null);
-    };
-
-    // for preview thumbnail image
-    const handleThumbnailImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setThumbnailImage(file);
-        }
-    };
-
-    // for preview cover image
-    const handleCoverImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setCoverImage(file);
-        }
     };
 
     // filtering logic
     useEffect(() => {
-        let filtered = [...blogs];
+        let filtered = [...blogCategories];
 
         // search
         if (search) {
             const searchLower = search.toLowerCase();
             filtered = filtered.filter((item) =>
-                [
-                    item?._id?.toString(),
-                    item?.title,
-                    item?.category?.name,
-                    item?.status,
-                    item?.createdBy?.fullName,
-                    item?.createdBy?.email,
-                    item?.createdBy?.phone,
-                    item?.createdBy?.username,
-                    item?.createdBy?.role,
-                ]
+                [item?._id?.toString(), item?.name, item?.status]
                     .map((field) => field?.toLowerCase() ?? "")
                     .some((field) => field?.includes(searchLower))
             );
@@ -361,31 +246,22 @@ const AdminBlogList = ({
         }
 
         setFilteredItems(filtered);
-    }, [search, sortBy, itemStatus, startDate, endDate, blogs]);
-
-    // set description when selectedItem changes
-    useEffect(() => {
-        setDescription(selectedItem?.description || "");
-    }, [selectedItem]);
+    }, [search, sortBy, itemStatus, startDate, endDate, blogCategories]);
 
     // listen for real-time events and update ui
     useEffect(() => {
-        socket.on("blogsUpdated", refreshData);
         socket.on("blogcategoriesUpdated", refreshData);
-        socket.on("usersUpdated", refreshData);
 
         return () => {
-            socket.off("blogsUpdated", refreshData);
             socket.off("blogcategoriesUpdated", refreshData);
-            socket.off("usersUpdated", refreshData);
         };
     }, []);
 
     return (
         <div>
             <div>
-                <h1>Blog List</h1>
-                <h2>Total Blogs: {filteredItems.length}</h2>
+                <h1>Blog Category List</h1>
+                <h2>Total Blog Categories: {filteredItems.length}</h2>
             </div>
 
             <div>
@@ -401,7 +277,7 @@ const AdminBlogList = ({
                         id="search"
                         autoComplete="on"
                         className=""
-                        placeholder="Search blogs..."
+                        placeholder="Search blog categories..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -503,16 +379,12 @@ const AdminBlogList = ({
 
                 {/* download csv button */}
                 <DownloadCSVButton
-                    data={blogs}
-                    filename="blogs.csv"
+                    data={blogCategories}
+                    filename="blog-categories.csv"
                     selectedColumns={[
                         "_id",
-                        "title",
+                        "name",
                         "slug",
-                        "category_name",
-                        "thumbnail",
-                        "coverImage",
-                        "createdBy_fullName",
                         "status",
                         "createdAt",
                         "updatedAt",
@@ -538,17 +410,11 @@ const AdminBlogList = ({
 
                             <th>#</th>
 
-                            <th>Thumbnail</th>
-
                             <th>Id</th>
 
-                            <th>Title</th>
+                            <th>Name</th>
 
                             <th>Slug</th>
-
-                            <th>Category</th>
-
-                            <th>Created By</th>
 
                             <th>Status</th>
 
@@ -563,8 +429,8 @@ const AdminBlogList = ({
                     <tbody>
                         {filteredItems.length === 0 ? (
                             <tr>
-                                <td colSpan="12" className="text-center">
-                                    No blogs found.
+                                <td colSpan="9" className="text-center">
+                                    No blog categories found.
                                 </td>
                             </tr>
                         ) : (
@@ -588,17 +454,6 @@ const AdminBlogList = ({
                                     <td>{index + 1}</td>
 
                                     <td>
-                                        <Image
-                                            src={item?.thumbnail}
-                                            className="w-auto h-auto object-cover"
-                                            width={100}
-                                            height={100}
-                                            alt="thumbnail"
-                                            priority
-                                        />
-                                    </td>
-
-                                    <td>
                                         <span
                                             className="hover:underline cursor-pointer"
                                             onClick={() => openViewModal(item)}
@@ -612,15 +467,11 @@ const AdminBlogList = ({
                                             className="hover:underline cursor-pointer"
                                             onClick={() => openViewModal(item)}
                                         >
-                                            {item?.title}
+                                            {item?.name}
                                         </span>
                                     </td>
 
                                     <td>{item?.slug}</td>
-
-                                    <td>{item?.category?.name}</td>
-
-                                    <td>{item?.createdBy?.fullName}</td>
 
                                     <td>{item?.status}</td>
 
@@ -656,7 +507,11 @@ const AdminBlogList = ({
 
             {/* add or edit modal */}
             <Modal
-                title={selectedItem ? "Edit Blog" : "Add New Blog"}
+                title={
+                    selectedItem
+                        ? "Edit Blog Category"
+                        : "Add New Blog Category"
+                }
                 isOpen={isAddOrEditModalOpen}
                 onClose={closeAddOrEditModal}
                 width="max-w-4xl"
@@ -664,158 +519,19 @@ const AdminBlogList = ({
                 <div>
                     <form onSubmit={handleSave}>
                         <div>
-                            <label htmlFor="title" className="">
-                                Title
+                            <label htmlFor="name" className="">
+                                Name
                             </label>
 
                             <input
                                 type="text"
-                                name="title"
-                                id="title"
+                                name="name"
+                                id="name"
                                 autoComplete="off"
                                 className=""
-                                placeholder="Enter title"
-                                defaultValue={selectedItem?.title || ""}
+                                placeholder="Enter name"
+                                defaultValue={selectedItem?.name || ""}
                                 required
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="category" className="">
-                                Category
-                            </label>
-
-                            <select
-                                name="category"
-                                id="category"
-                                className=""
-                                defaultValue={selectedItem?.category?._id || ""}
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select a category
-                                </option>
-
-                                {blogCategories?.map((blogCategory) => (
-                                    <option
-                                        key={blogCategory?._id}
-                                        value={blogCategory?._id}
-                                    >
-                                        {blogCategory?.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label htmlFor="createdBy" className="">
-                                Created By
-                            </label>
-
-                            <select
-                                name="createdBy"
-                                id="createdBy"
-                                className=""
-                                defaultValue={
-                                    selectedItem?.createdBy?._id || ""
-                                }
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select Created By
-                                </option>
-
-                                {users?.map((user) => (
-                                    <option key={user?._id} value={user?._id}>
-                                        {user?.fullName}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label htmlFor="thumbnail" className="">
-                                Thumbnail
-                            </label>
-
-                            {thumbnailImage || selectedItem?.thumbnail ? (
-                                <Image
-                                    src={
-                                        thumbnailImage
-                                            ? URL.createObjectURL(
-                                                  thumbnailImage
-                                              )
-                                            : selectedItem?.thumbnail
-                                    }
-                                    className="w-full"
-                                    width={1000}
-                                    height={1000}
-                                    alt="thumbnail image"
-                                    onClick={() =>
-                                        thumbnailImageRef.current.click()
-                                    }
-                                />
-                            ) : (
-                                <DefaultImage
-                                    width="w-full"
-                                    height="h-[400px]"
-                                    iconSize={100}
-                                    onClick={() =>
-                                        thumbnailImageRef.current.click()
-                                    }
-                                />
-                            )}
-
-                            <input
-                                type="file"
-                                name="thumbnail"
-                                id="thumbnail"
-                                className=""
-                                accept="image/*"
-                                onChange={handleThumbnailImageChange}
-                                ref={thumbnailImageRef}
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="coverImage" className="">
-                                Cover Image
-                            </label>
-
-                            {coverImage || selectedItem?.coverImage ? (
-                                <Image
-                                    src={
-                                        coverImage
-                                            ? URL.createObjectURL(coverImage)
-                                            : selectedItem?.coverImage
-                                    }
-                                    className="w-full"
-                                    width={1000}
-                                    height={1000}
-                                    alt="cover image"
-                                    onClick={() =>
-                                        coverImageRef.current.click()
-                                    }
-                                />
-                            ) : (
-                                <DefaultImage
-                                    width="w-full"
-                                    height="h-[400px]"
-                                    iconSize={100}
-                                    onClick={() =>
-                                        coverImageRef.current.click()
-                                    }
-                                />
-                            )}
-
-                            <input
-                                type="file"
-                                name="coverImage"
-                                id="coverImage"
-                                className=""
-                                accept="image/*"
-                                onChange={handleCoverImageChange}
-                                ref={coverImageRef}
                             />
                         </div>
 
@@ -837,15 +553,6 @@ const AdminBlogList = ({
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                             </select>
-                        </div>
-
-                        <div>
-                            <span className="">Description</span>
-
-                            <TextEditor
-                                onChange={setDescription}
-                                content={selectedItem?.description}
-                            />
                         </div>
 
                         <div>
@@ -873,7 +580,7 @@ const AdminBlogList = ({
                 <div>
                     <p>
                         Are you sure you want to delete <br />
-                        {selectedItem?.title} ?
+                        {selectedItem?.name} ?
                     </p>
 
                     <button type="button" onClick={closeDeleteModal}>
@@ -888,7 +595,7 @@ const AdminBlogList = ({
 
             {/* view modal */}
             <Modal
-                title="Blog Details"
+                title="Blog Category Details"
                 isOpen={isViewModalOpen}
                 onClose={closeViewModal}
                 width="max-w-4xl"
@@ -896,61 +603,18 @@ const AdminBlogList = ({
                 {selectedItem && (
                     <div>
                         <div>
-                            <h2>Thumbnail</h2>
-
-                            <Image
-                                src={selectedItem?.thumbnail}
-                                className="w-auto h-auto"
-                                width={500}
-                                height={500}
-                                alt="thumbnail"
-                            />
-                        </div>
-
-                        <div>
-                            <h2>Cover Image</h2>
-
-                            <Image
-                                src={selectedItem?.coverImage}
-                                className="w-auto h-auto"
-                                width={500}
-                                height={500}
-                                alt="cover image"
-                            />
-                        </div>
-
-                        <div>
                             <h2>Id</h2>
                             <p>{selectedItem?._id}</p>
                         </div>
 
                         <div>
-                            <h2>Title</h2>
-                            <p>{selectedItem?.title}</p>
+                            <h2>Name</h2>
+                            <p>{selectedItem?.name}</p>
                         </div>
 
                         <div>
                             <h2>Slug</h2>
                             <p>{selectedItem?.slug}</p>
-                        </div>
-
-                        <div>
-                            <h2>Description</h2>
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: selectedItem?.description,
-                                }}
-                            ></div>
-                        </div>
-
-                        <div>
-                            <h2>Category</h2>
-                            <p>{selectedItem?.category?.name}</p>
-                        </div>
-
-                        <div>
-                            <h2>Created By</h2>
-                            <p>{selectedItem?.createdBy?.fullName}</p>
                         </div>
 
                         <div>
@@ -974,4 +638,4 @@ const AdminBlogList = ({
     );
 };
 
-export default AdminBlogList;
+export default BlogCategoryList;

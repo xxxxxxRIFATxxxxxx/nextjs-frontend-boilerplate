@@ -49,7 +49,7 @@ const Header = () => {
                     <Link href="/login">Login</Link>
                 )}
                 {user && <Link href="/profile">{user?.fullName}</Link>}
-                <NotificationTab />
+                {user && <NotificationTab />}
             </div>
         </header>
     );
