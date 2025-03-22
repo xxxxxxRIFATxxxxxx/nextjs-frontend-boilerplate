@@ -352,10 +352,10 @@ const AdminBlogList = ({
         // search by date time range
         if (startDate && endDate) {
             filtered = filtered.filter((item) => {
-                const blogDate = new Date(item?.createdAt).getTime();
+                const itemDate = new Date(item?.createdAt).getTime();
                 return (
-                    blogDate >= new Date(startDate).getTime() &&
-                    blogDate <= new Date(endDate).getTime()
+                    itemDate >= new Date(startDate).getTime() &&
+                    itemDate <= new Date(endDate).getTime()
                 );
             });
         }

@@ -12,17 +12,18 @@ import fetchDataForClient from "@/helpers/fetchDataForClient";
 
 const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
-const BlogCategoryList = ({ initialBlogCategories }) => {
-    const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
+const NotificationList = ({ initialNotifications, initialUsers }) => {
+    const [notifications, setNotifications] = useState(initialNotifications);
+    const [users, setUsers] = useState(initialUsers);
 
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState("oldest");
     const [itemStatus, setItemStatus] = useState("all");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [filteredItems, setFilteredItems] = useState(blogCategories);
+    const [filteredItems, setFilteredItems] = useState(notifications);
     const { createItem, updateItem, deleteItem, deleteMultipleItems, loading } =
-        useCrud("blogCategories");
+        useCrud("notifications");
 
     const [isAddOrEditModalOpen, setIsAddOrEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -33,23 +34,29 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
-        const updatedCategoriesResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
+        const updatedNotificationsResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/notifications`
+        );
+        const updatedUsersResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users`
         );
 
-        const updatedBlogCategories = updatedCategoriesResponse?.data || [];
+        const updatedNotifications = updatedNotificationsResponse?.data || [];
+        const updatedUsers = updatedUsersResponse?.data || [];
 
-        const updatedBlogCategoriesError =
-            updatedCategoriesResponse?.error || null;
+        const updatedNotificationsError =
+            updatedNotificationsResponse?.error || null;
+        const updatedUsersError = updatedUsersResponse?.error || null;
 
-        if (updatedBlogCategoriesError) {
-            const errorMessage = [updatedBlogCategoriesError]
+        if (updatedNotificationsError || updatedUsersError) {
+            const errorMessage = [updatedNotificationsError, updatedUsersError]
                 .filter(Boolean)
                 .join("\n");
 
             toast.error(errorMessage);
         } else {
-            setBlogCategories(updatedBlogCategories);
+            setNotifications(updatedNotifications);
+            setUsers(updatedUsers);
         }
     };
 
@@ -99,12 +106,12 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
     const handleSave = async (e) => {
         e.preventDefault();
 
-        const name = e.target.name.value.trim();
+        const message = e.target.message.value.trim();
         const status = e.target.status.value.trim();
 
         if (selectedItem) {
             const response = await updateItem(selectedItem._id, {
-                name,
+                message,
                 status,
             });
 
@@ -127,7 +134,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
             }
         } else {
             const response = await createItem({
-                name,
+                message,
                 status,
             });
 
@@ -206,13 +213,13 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
     // filtering logic
     useEffect(() => {
-        let filtered = [...blogCategories];
+        let filtered = [...notifications];
 
         // search
         if (search) {
             const searchLower = search.toLowerCase();
             filtered = filtered.filter((item) =>
-                [item?._id?.toString(), item?.name, item?.status]
+                [item?._id?.toString(), item?.message, item?.status]
                     .map((field) => field?.toLowerCase() ?? "")
                     .some((field) => field?.includes(searchLower))
             );
@@ -246,22 +253,29 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
         }
 
         setFilteredItems(filtered);
-    }, [search, sortBy, itemStatus, startDate, endDate, blogCategories]);
+    }, [search, sortBy, itemStatus, startDate, endDate, notifications]);
+
+    // set description when selectedItem changes
+    // useEffect(() => {
+    //     setDescription(selectedItem?.description || "");
+    // }, [selectedItem]);
 
     // listen for real-time events and update ui
     useEffect(() => {
-        socket.on("blogcategoriesUpdated", refreshData);
+        socket.on("notificationsUpdated", refreshData);
+        socket.on("usersUpdated", refreshData);
 
         return () => {
-            socket.off("blogcategoriesUpdated", refreshData);
+            socket.off("notificationsUpdated", refreshData);
+            socket.off("usersUpdated", refreshData);
         };
     }, []);
 
     return (
         <div>
             <div>
-                <h1>Blog Category List</h1>
-                <h2>Total Blog Categories: {filteredItems.length}</h2>
+                <h1>Notification List</h1>
+                <h2>Total Notifications: {filteredItems.length}</h2>
             </div>
 
             <div>
@@ -277,7 +291,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                         id="search"
                         autoComplete="on"
                         className=""
-                        placeholder="Search blog categories..."
+                        placeholder="Search notifications..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -379,12 +393,14 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
                 {/* download csv button */}
                 <DownloadCSVButton
-                    data={blogCategories}
-                    filename="blog-categories.csv"
+                    data={notifications}
+                    filename="notifications.csv"
                     selectedColumns={[
                         "_id",
-                        "name",
-                        "slug",
+                        "message",
+                        "seenBy",
+                        "specificUsers",
+                        "recipientRoles",
                         "status",
                         "createdAt",
                         "updatedAt",
@@ -412,9 +428,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
                             <th>Id</th>
 
-                            <th>Name</th>
-
-                            <th>Slug</th>
+                            <th>Message</th>
 
                             <th>Status</th>
 
@@ -429,8 +443,8 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                     <tbody>
                         {filteredItems.length === 0 ? (
                             <tr>
-                                <td colSpan="9" className="text-center">
-                                    No blog categories found.
+                                <td colSpan="8" className="text-center">
+                                    No notifications found.
                                 </td>
                             </tr>
                         ) : (
@@ -467,11 +481,9 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                                             className="hover:underline cursor-pointer"
                                             onClick={() => openViewModal(item)}
                                         >
-                                            {item?.name}
+                                            {item?.message}
                                         </span>
                                     </td>
-
-                                    <td>{item?.slug}</td>
 
                                     <td>{item?.status}</td>
 
@@ -508,9 +520,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
             {/* add or edit modal */}
             <Modal
                 title={
-                    selectedItem
-                        ? "Edit Blog Category"
-                        : "Add New Blog Category"
+                    selectedItem ? "Edit Notification" : "Add New Notification"
                 }
                 isOpen={isAddOrEditModalOpen}
                 onClose={closeAddOrEditModal}
@@ -519,18 +529,18 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                 <div>
                     <form onSubmit={handleSave}>
                         <div>
-                            <label htmlFor="name" className="">
-                                Name
+                            <label htmlFor="message" className="">
+                                Message
                             </label>
 
                             <input
                                 type="text"
-                                name="name"
-                                id="name"
+                                name="message"
+                                id="message"
                                 autoComplete="off"
                                 className=""
-                                placeholder="Enter name"
-                                defaultValue={selectedItem?.name || ""}
+                                placeholder="Enter message"
+                                defaultValue={selectedItem?.message || ""}
                                 required
                             />
                         </div>
@@ -580,7 +590,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                 <div>
                     <p>
                         Are you sure you want to delete <br />
-                        {selectedItem?.name} ?
+                        {selectedItem?.message} ?
                     </p>
 
                     <button type="button" onClick={closeDeleteModal}>
@@ -595,7 +605,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
             {/* view modal */}
             <Modal
-                title="Blog Category Details"
+                title="Blog Details"
                 isOpen={isViewModalOpen}
                 onClose={closeViewModal}
                 width="max-w-4xl"
@@ -608,13 +618,8 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                         </div>
 
                         <div>
-                            <h2>Name</h2>
-                            <p>{selectedItem?.name}</p>
-                        </div>
-
-                        <div>
-                            <h2>Slug</h2>
-                            <p>{selectedItem?.slug}</p>
+                            <h2>Message</h2>
+                            <p>{selectedItem?.message}</p>
                         </div>
 
                         <div>
@@ -638,4 +643,4 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
     );
 };
 
-export default BlogCategoryList;
+export default NotificationList;

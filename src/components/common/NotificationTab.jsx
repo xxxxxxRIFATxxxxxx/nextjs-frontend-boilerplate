@@ -41,7 +41,7 @@ const NotificationTab = () => {
 
     // count unseen notifications
     const unseenCount = notifications.filter(
-        (notif) => !notif.seenBy.includes(user?._id)
+        (notif) => !notif.seenBy.some((userObj) => userObj._id === user?._id) // Check populated objects
     ).length;
 
     return (
@@ -77,7 +77,9 @@ const NotificationTab = () => {
                                     key={notif?._id}
                                     className="relative p-2 bg-gray-100 rounded-lg text-sm flex flex-col"
                                 >
-                                    {!notif.seenBy.includes(user?._id) && (
+                                    {!notif.seenBy.some(
+                                        (userObj) => userObj._id === user?._id
+                                    ) && (
                                         <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                                     )}
 

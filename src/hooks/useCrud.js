@@ -96,34 +96,11 @@ const useCrud = (endpoint) => {
         }
     };
 
-    const createMultipleOnlineMasterClass = async (promoCodes) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/masterClasses/bulk/create-online-master-class`,
-                { promoCodes },
-                { headers: getAuthHeaders() }
-            );
-            return response.data;
-        } catch (error) {
-            return (
-                error?.response?.data?.error ||
-                error?.response?.data ||
-                error?.message ||
-                "An unexpected error occurred. Please try again later."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return {
         createItem,
         updateItem,
         deleteItem,
         deleteMultipleItems,
-        createMultipleOnlineMasterClass,
         loading,
         error,
     };

@@ -56,22 +56,24 @@ export const NotificationProvider = ({ children }) => {
     const markAsSeen = async () => {
         try {
             const unseenNotificationIds = notifications
-                .filter((n) => !n.seenBy.includes(user._id)) // get unseen notifications
-                .map((n) => n._id); // extract their IDs
+                .filter(
+                    (n) => !n.seenBy.some((userObj) => userObj._id === user._id)
+                ) // Check populated user objects
+                .map((n) => n._id); // Extract their IDs
 
-            if (unseenNotificationIds.length === 0) return; // no unseen notifications
+            if (unseenNotificationIds.length === 0) return; // No unseen notifications
 
             const response = await axios.put(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/user-specific-notifications/seen`,
-                { notificationIds: unseenNotificationIds }, // send array of IDs
+                { notificationIds: unseenNotificationIds }, // Send array of IDs
                 { headers: getAuthHeaders() }
             );
 
-            // update state to mark notifications as seen
+            // Update state to mark notifications as seen
             setNotifications((prev) =>
                 prev.map((n) =>
                     unseenNotificationIds.includes(n._id)
-                        ? { ...n, seenBy: [...n.seenBy, user._id] }
+                        ? { ...n, seenBy: [...n.seenBy, { _id: user._id }] } // Add populated user
                         : n
                 )
             );

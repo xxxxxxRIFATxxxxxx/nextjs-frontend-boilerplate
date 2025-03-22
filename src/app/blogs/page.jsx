@@ -6,29 +6,21 @@ import fetchData from "@/helpers/fetchData";
 
 const Blogs = async () => {
     const blogsResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/get/only/active`
     );
 
     const blogCategoriesResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/get/only/active`
     );
 
     const usersResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/get/only/active`
     );
 
     // extract data or error messages
-    const initialBlogs = (blogsResponse?.data || []).filter(
-        (item) => item?.status === "active"
-    );
-
-    const initialBlogCategories = (blogCategoriesResponse?.data || []).filter(
-        (category) => category?.status === "active"
-    );
-
-    const initialUsers = (usersResponse?.data || []).filter(
-        (user) => user?.status === "active"
-    );
+    const initialBlogs = blogsResponse?.data || [];
+    const initialBlogCategories = blogCategoriesResponse?.data || [];
+    const initialUsers = usersResponse?.data || [];
 
     const blogsError = blogsResponse?.error || null;
     const blogCategoriesError = blogCategoriesResponse?.error || null;

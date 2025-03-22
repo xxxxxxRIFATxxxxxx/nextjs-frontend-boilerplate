@@ -32,15 +32,15 @@ const UserBlogList = ({
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
         const updatedBlogsResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/get/only/active`
         );
 
         const updatedCategoriesResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/get/only/active`
         );
 
         const updatedUsersResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users/get/only/active`
         );
 
         const updatedBlogs = updatedBlogsResponse?.data || [];
@@ -131,10 +131,10 @@ const UserBlogList = ({
         // search by date time range
         if (startDate && endDate) {
             filtered = filtered.filter((item) => {
-                const blogDate = new Date(item.createdAt).getTime();
+                const itemDate = new Date(item.createdAt).getTime();
                 return (
-                    blogDate >= new Date(startDate).getTime() &&
-                    blogDate <= new Date(endDate).getTime()
+                    itemDate >= new Date(startDate).getTime() &&
+                    itemDate <= new Date(endDate).getTime()
                 );
             });
         }
