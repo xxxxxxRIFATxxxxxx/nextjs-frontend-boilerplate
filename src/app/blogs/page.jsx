@@ -27,7 +27,9 @@ const Blogs = async () => {
     const usersError = usersResponse?.error || null;
 
     return (
-        <PrivateRoute allowedRoles={["super_admin", "admin", "moderator"]}>
+        <PrivateRoute
+            allowedRoles={["super_admin", "admin", "moderator", "user"]}
+        >
             <Layout>
                 {/* error message */}
                 <section>

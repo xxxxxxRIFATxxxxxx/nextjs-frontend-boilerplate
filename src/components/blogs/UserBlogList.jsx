@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { io } from "socket.io-client";
 import { useSearchParams } from "next/navigation";
+import { io } from "socket.io-client";
+import Select from "react-select";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
@@ -191,66 +192,100 @@ const UserBlogList = ({
 
                 {/* filter by blog category */}
                 <div>
-                    <label htmlFor="category" className="">
-                        Category
-                    </label>
+                    <span className="">Category</span>
 
-                    <select
-                        name="category"
-                        id="category"
+                    <Select
+                        options={[
+                            { label: "All", value: "all" },
+                            ...blogCategories.map((blogCategory) => ({
+                                label: blogCategory?.name,
+                                value: blogCategory?.name,
+                            })),
+                        ]}
+                        onChange={(selectedOption) =>
+                            setCategoryFilter(selectedOption.value)
+                        }
                         className=""
-                        value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
-                    >
-                        <option value="all">All</option>
-
-                        {blogCategories?.map((category) => (
-                            <option key={category._id} value={category.name}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
+                        placeholder="Search and select category"
+                        value={
+                            categoryFilter
+                                ? {
+                                      label:
+                                          categoryFilter === "all"
+                                              ? "All"
+                                              : blogCategories.find(
+                                                    (blogCategory) =>
+                                                        blogCategory?.name ===
+                                                        categoryFilter
+                                                )?.name || "All",
+                                      value: categoryFilter,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* filter by created by */}
                 <div>
-                    <label htmlFor="createdBy" className="">
-                        Created By
-                    </label>
+                    <span className="">Created By</span>
 
-                    <select
-                        name="createdBy"
-                        id="createdBy"
+                    <Select
+                        options={[
+                            { label: "All", value: "all" },
+                            ...users.map((user) => ({
+                                label: user.fullName,
+                                value: user.fullName,
+                            })),
+                        ]}
+                        onChange={(selectedOption) =>
+                            setCreatedByFilter(selectedOption.value)
+                        }
                         className=""
-                        value={createdByFilter}
-                        onChange={(e) => setCreatedByFilter(e.target.value)}
-                    >
-                        <option value="all">All</option>
-
-                        {users?.map((user) => (
-                            <option key={user._id} value={user.fullName}>
-                                {user.fullName}
-                            </option>
-                        ))}
-                    </select>
+                        placeholder="Search and select user"
+                        value={
+                            createdByFilter
+                                ? {
+                                      label:
+                                          createdByFilter === "all"
+                                              ? "All"
+                                              : users.find(
+                                                    (user) =>
+                                                        user.fullName ===
+                                                        createdByFilter
+                                                )?.fullName || "All",
+                                      value: createdByFilter,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* sort by newest or oldest */}
                 <div>
-                    <label htmlFor="sortBy" className="">
-                        Sort by
-                    </label>
+                    <span className="">Sort by</span>
 
-                    <select
-                        name="sortBy"
-                        id="sortBy"
+                    <Select
+                        options={[
+                            { label: "Newest", value: "newest" },
+                            { label: "Oldest", value: "oldest" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setSortBy(selectedOption.value)
+                        }
                         className=""
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                    >
-                        <option value="newest">Newest</option>
-                        <option value="oldest">Oldest</option>
-                    </select>
+                        placeholder="Select sorting order"
+                        value={
+                            sortBy
+                                ? {
+                                      label:
+                                          sortBy === "newest"
+                                              ? "Newest"
+                                              : "Oldest",
+                                      value: sortBy,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* search by date time rang */}

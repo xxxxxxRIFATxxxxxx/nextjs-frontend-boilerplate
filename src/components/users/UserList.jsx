@@ -4,6 +4,7 @@ import Image from "next/image";
 import { io } from "socket.io-client";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import Select from "react-select";
 import useCrud from "@/hooks/useCrud";
 import Modal from "@/components/common/Modal";
 import TextEditor from "@/components/common/TextEditor";
@@ -38,6 +39,19 @@ const UserList = ({ initialUsers }) => {
     const [bio, setBio] = useState("");
     const [userImage, setUserImage] = useState(null);
     const userImageRef = useRef(null);
+    const [role, setRole] = useState(null);
+    const roleOptions = [
+        { label: "Super Admin", value: "super_admin" },
+        { label: "Admin", value: "admin" },
+        { label: "Moderator", value: "moderator" },
+        { label: "User", value: "user" },
+    ];
+    const [status, setStatus] = useState(null);
+    const statusOptions = [
+        { label: "Active", value: "active" },
+        { label: "Inactive", value: "inactive" },
+        { label: "Banned", value: "banned" },
+    ];
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
@@ -108,8 +122,8 @@ const UserList = ({ initialUsers }) => {
         const phone = e.target.phone.value.trim();
         const username = e.target.username.value.trim();
         const password = e.target.password.value.trim();
-        const role = e.target.role.value.trim();
-        const status = e.target.status.value.trim();
+        const roleValue = role?.value;
+        const statusValue = status?.value;
         const image = e.target.image.files[0];
         const dateOfBirth = e.target.dateOfBirth.value
             ? new Date(e.target.dateOfBirth.value)
@@ -137,8 +151,8 @@ const UserList = ({ initialUsers }) => {
             email,
             phone,
             username,
-            role,
-            status,
+            role: roleValue,
+            status: statusValue,
             image: imageUrl,
             dateOfBirth,
             address: { street, city, state, zipCode, country },
@@ -245,6 +259,8 @@ const UserList = ({ initialUsers }) => {
     // for remove exixting items
     const removeExixtingItems = () => {
         setSelectedItem(null);
+        setRole(null);
+        setStatus(null);
         setUserImage(null);
     };
 
@@ -308,8 +324,19 @@ const UserList = ({ initialUsers }) => {
         setFilteredItems(filtered);
     }, [search, sortBy, itemStatus, startDate, endDate, users]);
 
-    // set description when selectedItem changes
+    // update state when selectedItem changes
     useEffect(() => {
+        setRole(
+            roleOptions.find((option) => option.value === selectedItem?.role) ||
+                null
+        );
+
+        setStatus(
+            statusOptions.find(
+                (option) => option.value === selectedItem?.status
+            ) || null
+        );
+
         setBio(selectedItem?.bio || "");
     }, [selectedItem]);
 
@@ -350,39 +377,64 @@ const UserList = ({ initialUsers }) => {
 
                 {/* sort by newest or oldest */}
                 <div>
-                    <label htmlFor="sortBy" className="">
-                        Sort by
-                    </label>
+                    <span className="">Sort by</span>
 
-                    <select
-                        name="sortBy"
-                        id="sortBy"
+                    <Select
+                        options={[
+                            { label: "Newest", value: "newest" },
+                            { label: "Oldest", value: "oldest" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setSortBy(selectedOption.value)
+                        }
                         className=""
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                    >
-                        <option value="newest">Newest</option>
-                        <option value="oldest">Oldest</option>
-                    </select>
+                        placeholder="Select sorting order"
+                        value={
+                            sortBy
+                                ? {
+                                      label:
+                                          sortBy === "newest"
+                                              ? "Newest"
+                                              : "Oldest",
+                                      value: sortBy,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* filter by status */}
                 <div>
-                    <label htmlFor="status" className="">
-                        Status
-                    </label>
+                    <span className="">Status</span>
 
-                    <select
-                        name="status"
-                        id="status"
+                    <Select
+                        options={[
+                            { label: "All", value: "all" },
+                            { label: "Active", value: "active" },
+                            { label: "Inactive", value: "inactive" },
+                            { label: "Banned", value: "banned" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setItemStatus(selectedOption.value)
+                        }
                         className=""
-                        value={itemStatus}
-                        onChange={(e) => setItemStatus(e.target.value)}
-                    >
-                        <option value="all">All</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                        placeholder="Select status"
+                        value={
+                            itemStatus
+                                ? {
+                                      label:
+                                          itemStatus === "all"
+                                              ? "All"
+                                              : itemStatus === "active"
+                                              ? "Active"
+                                              : itemStatus === "inactive"
+                                              ? "Inactive"
+                                              : "Banned",
+                                      value: itemStatus,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* search by date time rang */}
@@ -726,47 +778,38 @@ const UserList = ({ initialUsers }) => {
                         </div>
 
                         <div>
-                            <label htmlFor="role" className="">
-                                Role
-                            </label>
+                            <span className="">Role</span>
 
-                            <select
-                                name="role"
-                                id="role"
+                            <Select
+                                options={roleOptions}
+                                onChange={setRole}
                                 className=""
-                                defaultValue={selectedItem?.role || ""}
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select a role
-                                </option>
-
-                                <option value="super_admin">Super Admin</option>
-                                <option value="admin">Admin</option>
-                                <option value="moderator">Moderator</option>
-                                <option value="user">user</option>
-                            </select>
+                                placeholder="Select role"
+                                defaultValue={
+                                    roleOptions.find(
+                                        (role) =>
+                                            role.value === selectedItem?.role
+                                    ) || null
+                                }
+                            />
                         </div>
 
                         <div>
-                            <label htmlFor="status" className="">
-                                Status
-                            </label>
+                            <span className="">Status</span>
 
-                            <select
-                                name="status"
-                                id="status"
+                            <Select
+                                options={statusOptions}
+                                onChange={setStatus}
                                 className=""
-                                defaultValue={selectedItem?.status || ""}
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select a status
-                                </option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                                <option value="banned">Banned</option>
-                            </select>
+                                placeholder="Select status"
+                                defaultValue={
+                                    statusOptions.find(
+                                        (status) =>
+                                            status.value ===
+                                            selectedItem?.status
+                                    ) || null
+                                }
+                            />
                         </div>
 
                         <div>

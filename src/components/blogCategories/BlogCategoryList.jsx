@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import Select from "react-select";
 import useCrud from "@/hooks/useCrud";
 import Modal from "@/components/common/Modal";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
@@ -30,6 +31,11 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
+    const [status, setStatus] = useState(null);
+    const statusOptions = [
+        { label: "Active", value: "active" },
+        { label: "Inactive", value: "inactive" },
+    ];
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
@@ -100,12 +106,12 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
         e.preventDefault();
 
         const name = e.target.name.value.trim();
-        const status = e.target.status.value.trim();
+        const statusValue = status?.value;
 
         if (selectedItem) {
             const response = await updateItem(selectedItem._id, {
                 name,
-                status,
+                status: statusValue,
             });
 
             if (response?.data) {
@@ -128,7 +134,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
         } else {
             const response = await createItem({
                 name,
-                status,
+                status: statusValue,
             });
 
             if (response?.data) {
@@ -202,6 +208,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
     // for remove exixting items
     const removeExixtingItems = () => {
         setSelectedItem(null);
+        setStatus(null);
     };
 
     // filtering logic
@@ -248,6 +255,15 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
         setFilteredItems(filtered);
     }, [search, sortBy, itemStatus, startDate, endDate, blogCategories]);
 
+    // update state when selectedItem changes
+    useEffect(() => {
+        setStatus(
+            statusOptions.find(
+                (option) => option.value === selectedItem?.status
+            ) || null
+        );
+    }, [selectedItem]);
+
     // listen for real-time events and update ui
     useEffect(() => {
         socket.on("blogcategoriesUpdated", refreshData);
@@ -285,39 +301,61 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
                 {/* sort by newest or oldest */}
                 <div>
-                    <label htmlFor="sortBy" className="">
-                        Sort by
-                    </label>
+                    <span className="">Sort by</span>
 
-                    <select
-                        name="sortBy"
-                        id="sortBy"
+                    <Select
+                        options={[
+                            { label: "Newest", value: "newest" },
+                            { label: "Oldest", value: "oldest" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setSortBy(selectedOption.value)
+                        }
                         className=""
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                    >
-                        <option value="newest">Newest</option>
-                        <option value="oldest">Oldest</option>
-                    </select>
+                        placeholder="Select sorting order"
+                        value={
+                            sortBy
+                                ? {
+                                      label:
+                                          sortBy === "newest"
+                                              ? "Newest"
+                                              : "Oldest",
+                                      value: sortBy,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* filter by status */}
                 <div>
-                    <label htmlFor="status" className="">
-                        Status
-                    </label>
+                    <span className="">Status</span>
 
-                    <select
-                        name="status"
-                        id="status"
+                    <Select
+                        options={[
+                            { label: "All", value: "all" },
+                            { label: "Active", value: "active" },
+                            { label: "Inactive", value: "inactive" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setItemStatus(selectedOption.value)
+                        }
                         className=""
-                        value={itemStatus}
-                        onChange={(e) => setItemStatus(e.target.value)}
-                    >
-                        <option value="all">All</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                        placeholder="Select status"
+                        value={
+                            itemStatus
+                                ? {
+                                      label:
+                                          itemStatus === "all"
+                                              ? "All"
+                                              : itemStatus === "active"
+                                              ? "Active"
+                                              : "Inactive",
+                                      value: itemStatus,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* search by date time rang */}
@@ -536,23 +574,21 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                         </div>
 
                         <div>
-                            <label htmlFor="status" className="">
-                                Status
-                            </label>
+                            <span className="">Status</span>
 
-                            <select
-                                name="status"
-                                id="status"
+                            <Select
+                                options={statusOptions}
+                                onChange={setStatus}
                                 className=""
-                                defaultValue={selectedItem?.status || ""}
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select a status
-                                </option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
+                                placeholder="Select status"
+                                defaultValue={
+                                    statusOptions.find(
+                                        (status) =>
+                                            status.value ===
+                                            selectedItem?.status
+                                    ) || null
+                                }
+                            />
                         </div>
 
                         <div>

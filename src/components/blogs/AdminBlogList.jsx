@@ -4,6 +4,7 @@ import Image from "next/image";
 import { io } from "socket.io-client";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import Select from "react-select";
 import useCrud from "@/hooks/useCrud";
 import Modal from "@/components/common/Modal";
 import TextEditor from "@/components/common/TextEditor";
@@ -40,11 +41,18 @@ const AdminBlogList = ({
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
+    const [category, setCategory] = useState(null);
+    const [createdBy, setCreatedBy] = useState(null);
     const [description, setDescription] = useState("");
     const [thumbnailImage, setThumbnailImage] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
     const thumbnailImageRef = useRef(null);
     const coverImageRef = useRef(null);
+    const [status, setStatus] = useState(null);
+    const statusOptions = [
+        { label: "Active", value: "active" },
+        { label: "Inactive", value: "inactive" },
+    ];
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
@@ -137,11 +145,11 @@ const AdminBlogList = ({
         e.preventDefault();
 
         const title = e.target.title.value.trim();
-        const category = e.target.category.value.trim();
+        const categoryId = category?.value;
         const thumbnail = e.target.thumbnail.files[0];
         const coverImage = e.target.coverImage.files[0];
-        const createdBy = e.target.createdBy.value.trim();
-        const status = e.target.status.value.trim();
+        const createdById = createdBy?.value;
+        const statusValue = status?.value;
 
         let thumbnailUrl = selectedItem?.thumbnail;
 
@@ -171,11 +179,11 @@ const AdminBlogList = ({
             const response = await updateItem(selectedItem._id, {
                 title,
                 description,
-                category,
+                category: categoryId,
                 thumbnail: thumbnailUrl,
                 coverImage: coverImageUrl,
-                createdBy,
-                status,
+                createdBy: createdById,
+                status: statusValue,
             });
 
             if (response?.data) {
@@ -206,11 +214,11 @@ const AdminBlogList = ({
             const response = await createItem({
                 title,
                 description,
-                category,
+                category: categoryId,
                 thumbnail: thumbnailUrl,
                 coverImage: coverImageUrl,
-                createdBy,
-                status,
+                createdBy: createdById,
+                status: statusValue,
             });
 
             if (response?.data) {
@@ -289,8 +297,11 @@ const AdminBlogList = ({
     // for remove exixting items
     const removeExixtingItems = () => {
         setSelectedItem(null);
+        setCategory(null);
         setThumbnailImage(null);
         setCoverImage(null);
+        setCreatedBy(null);
+        setStatus(null);
     };
 
     // for preview thumbnail image
@@ -363,9 +374,36 @@ const AdminBlogList = ({
         setFilteredItems(filtered);
     }, [search, sortBy, itemStatus, startDate, endDate, blogs]);
 
-    // set description when selectedItem changes
+    // update state when selectedItem changes
     useEffect(() => {
+        setCategory(
+            blogCategories.find(
+                (blogCategory) =>
+                    blogCategory?._id === selectedItem?.category?._id
+            )
+                ? {
+                      label: selectedItem?.category?.name,
+                      value: selectedItem?.category?._id,
+                  }
+                : null
+        );
+
+        setCreatedBy(
+            users.find((user) => user?._id === selectedItem?.createdBy?._id)
+                ? {
+                      label: selectedItem?.createdBy?.email,
+                      value: selectedItem?.createdBy?._id,
+                  }
+                : null
+        );
+
         setDescription(selectedItem?.description || "");
+
+        setStatus(
+            statusOptions.find(
+                (option) => option.value === selectedItem?.status
+            ) || null
+        );
     }, [selectedItem]);
 
     // listen for real-time events and update ui
@@ -409,39 +447,61 @@ const AdminBlogList = ({
 
                 {/* sort by newest or oldest */}
                 <div>
-                    <label htmlFor="sortBy" className="">
-                        Sort by
-                    </label>
+                    <span className="">Sort by</span>
 
-                    <select
-                        name="sortBy"
-                        id="sortBy"
+                    <Select
+                        options={[
+                            { label: "Newest", value: "newest" },
+                            { label: "Oldest", value: "oldest" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setSortBy(selectedOption.value)
+                        }
                         className=""
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                    >
-                        <option value="newest">Newest</option>
-                        <option value="oldest">Oldest</option>
-                    </select>
+                        placeholder="Select sorting order"
+                        value={
+                            sortBy
+                                ? {
+                                      label:
+                                          sortBy === "newest"
+                                              ? "Newest"
+                                              : "Oldest",
+                                      value: sortBy,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* filter by status */}
                 <div>
-                    <label htmlFor="status" className="">
-                        Status
-                    </label>
+                    <span className="">Status</span>
 
-                    <select
-                        name="status"
-                        id="status"
+                    <Select
+                        options={[
+                            { label: "All", value: "all" },
+                            { label: "Active", value: "active" },
+                            { label: "Inactive", value: "inactive" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setItemStatus(selectedOption.value)
+                        }
                         className=""
-                        value={itemStatus}
-                        onChange={(e) => setItemStatus(e.target.value)}
-                    >
-                        <option value="all">All</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                        placeholder="Select status"
+                        value={
+                            itemStatus
+                                ? {
+                                      label:
+                                          itemStatus === "all"
+                                              ? "All"
+                                              : itemStatus === "active"
+                                              ? "Active"
+                                              : "Inactive",
+                                      value: itemStatus,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* search by date time rang */}
@@ -681,56 +741,33 @@ const AdminBlogList = ({
                         </div>
 
                         <div>
-                            <label htmlFor="category" className="">
-                                Category
-                            </label>
+                            <span className="">Category</span>
 
-                            <select
-                                name="category"
-                                id="category"
+                            <Select
+                                options={blogCategories.map((blogCategory) => ({
+                                    value: blogCategory?._id,
+                                    label: blogCategory?.name,
+                                }))}
+                                onChange={setCategory}
                                 className=""
-                                defaultValue={selectedItem?.category?._id || ""}
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select a category
-                                </option>
-
-                                {blogCategories?.map((blogCategory) => (
-                                    <option
-                                        key={blogCategory?._id}
-                                        value={blogCategory?._id}
-                                    >
-                                        {blogCategory?.name}
-                                    </option>
-                                ))}
-                            </select>
+                                placeholder="Search and select category"
+                                value={category}
+                            />
                         </div>
 
                         <div>
-                            <label htmlFor="createdBy" className="">
-                                Created By
-                            </label>
+                            <span className="">Created By</span>
 
-                            <select
-                                name="createdBy"
-                                id="createdBy"
+                            <Select
+                                options={users.map((user) => ({
+                                    label: user?.email,
+                                    value: user?._id,
+                                }))}
+                                onChange={setCreatedBy}
                                 className=""
-                                defaultValue={
-                                    selectedItem?.createdBy?._id || ""
-                                }
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select Created By
-                                </option>
-
-                                {users?.map((user) => (
-                                    <option key={user?._id} value={user?._id}>
-                                        {user?.fullName}
-                                    </option>
-                                ))}
-                            </select>
+                                placeholder="Search and select user"
+                                value={createdBy}
+                            />
                         </div>
 
                         <div>
@@ -820,23 +857,21 @@ const AdminBlogList = ({
                         </div>
 
                         <div>
-                            <label htmlFor="status" className="">
-                                Status
-                            </label>
+                            <span className="">Status</span>
 
-                            <select
-                                name="status"
-                                id="status"
+                            <Select
+                                options={statusOptions}
+                                onChange={setStatus}
                                 className=""
-                                defaultValue={selectedItem?.status || ""}
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select a status
-                                </option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
+                                placeholder="Select status"
+                                defaultValue={
+                                    statusOptions.find(
+                                        (status) =>
+                                            status.value ===
+                                            selectedItem?.status
+                                    ) || null
+                                }
+                            />
                         </div>
 
                         <div>

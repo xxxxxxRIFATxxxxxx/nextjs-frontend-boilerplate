@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import Select from "react-select";
 import useCrud from "@/hooks/useCrud";
 import Modal from "@/components/common/Modal";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
@@ -31,6 +32,20 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
+    const [seenBy, setSeenBy] = useState([]);
+    const [specificUsers, setSpecificUsers] = useState([]);
+    const [recipientRoles, setRecipientRoles] = useState([]);
+    const [status, setStatus] = useState(null);
+    const roleOptions = [
+        { label: "Super Admin", value: "super_admin" },
+        { label: "Admin", value: "admin" },
+        { label: "Moderator", value: "moderator" },
+        { label: "User", value: "user" },
+    ];
+    const statusOptions = [
+        { label: "Active", value: "active" },
+        { label: "Inactive", value: "inactive" },
+    ];
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
@@ -107,12 +122,18 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
         e.preventDefault();
 
         const message = e.target.message.value.trim();
-        const status = e.target.status.value.trim();
+        const seenByIds = seenBy.map((user) => user.value);
+        const specificUserIds = specificUsers.map((user) => user.value);
+        const recipientRoleValues = recipientRoles.map((role) => role.value);
+        const statusValue = status?.value;
 
         if (selectedItem) {
             const response = await updateItem(selectedItem._id, {
                 message,
-                status,
+                seenBy: seenByIds,
+                specificUsers: specificUserIds,
+                recipientRoles: recipientRoleValues,
+                status: statusValue,
             });
 
             if (response?.data) {
@@ -135,7 +156,10 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
         } else {
             const response = await createItem({
                 message,
-                status,
+                seenBy: seenByIds,
+                specificUsers: specificUserIds,
+                recipientRoles: recipientRoleValues,
+                status: statusValue,
             });
 
             if (response?.data) {
@@ -209,6 +233,10 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
     // for remove exixting items
     const removeExixtingItems = () => {
         setSelectedItem(null);
+        setSeenBy([]);
+        setSpecificUsers([]);
+        setRecipientRoles([]);
+        setStatus(null);
     };
 
     // filtering logic
@@ -255,10 +283,34 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
         setFilteredItems(filtered);
     }, [search, sortBy, itemStatus, startDate, endDate, notifications]);
 
-    // set description when selectedItem changes
-    // useEffect(() => {
-    //     setDescription(selectedItem?.description || "");
-    // }, [selectedItem]);
+    // update state when selectedItem changes
+    useEffect(() => {
+        setSeenBy(
+            selectedItem?.seenBy?.map((user) => ({
+                label: user?.email,
+                value: user?._id,
+            })) || []
+        );
+
+        setSpecificUsers(
+            selectedItem?.specificUsers?.map((user) => ({
+                label: user?.email,
+                value: user?._id,
+            })) || []
+        );
+
+        setRecipientRoles(
+            roleOptions.filter((role) =>
+                selectedItem?.recipientRoles?.includes(role.value)
+            ) || []
+        );
+
+        setStatus(
+            statusOptions.find(
+                (status) => status.value === selectedItem?.status
+            ) || null
+        );
+    }, [selectedItem]);
 
     // listen for real-time events and update ui
     useEffect(() => {
@@ -299,39 +351,61 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
                 {/* sort by newest or oldest */}
                 <div>
-                    <label htmlFor="sortBy" className="">
-                        Sort by
-                    </label>
+                    <span className="">Sort by</span>
 
-                    <select
-                        name="sortBy"
-                        id="sortBy"
+                    <Select
+                        options={[
+                            { label: "Newest", value: "newest" },
+                            { label: "Oldest", value: "oldest" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setSortBy(selectedOption.value)
+                        }
                         className=""
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                    >
-                        <option value="newest">Newest</option>
-                        <option value="oldest">Oldest</option>
-                    </select>
+                        placeholder="Select sorting order"
+                        value={
+                            sortBy
+                                ? {
+                                      label:
+                                          sortBy === "newest"
+                                              ? "Newest"
+                                              : "Oldest",
+                                      value: sortBy,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* filter by status */}
                 <div>
-                    <label htmlFor="status" className="">
-                        Status
-                    </label>
+                    <span className="">Status</span>
 
-                    <select
-                        name="status"
-                        id="status"
+                    <Select
+                        options={[
+                            { label: "All", value: "all" },
+                            { label: "Active", value: "active" },
+                            { label: "Inactive", value: "inactive" },
+                        ]}
+                        onChange={(selectedOption) =>
+                            setItemStatus(selectedOption.value)
+                        }
                         className=""
-                        value={itemStatus}
-                        onChange={(e) => setItemStatus(e.target.value)}
-                    >
-                        <option value="all">All</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                        placeholder="Select status"
+                        value={
+                            itemStatus
+                                ? {
+                                      label:
+                                          itemStatus === "all"
+                                              ? "All"
+                                              : itemStatus === "active"
+                                              ? "Active"
+                                              : "Inactive",
+                                      value: itemStatus,
+                                  }
+                                : null
+                        }
+                    />
                 </div>
 
                 {/* search by date time rang */}
@@ -398,8 +472,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                     selectedColumns={[
                         "_id",
                         "message",
-                        "seenBy",
-                        "specificUsers",
                         "recipientRoles",
                         "status",
                         "createdAt",
@@ -430,6 +502,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
                             <th>Message</th>
 
+                            <th>Recipient Roles</th>
+
                             <th>Status</th>
 
                             <th>Created</th>
@@ -443,7 +517,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                     <tbody>
                         {filteredItems.length === 0 ? (
                             <tr>
-                                <td colSpan="8" className="text-center">
+                                <td colSpan="9" className="text-center">
                                     No notifications found.
                                 </td>
                             </tr>
@@ -483,6 +557,21 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                         >
                                             {item?.message}
                                         </span>
+                                    </td>
+
+                                    <td>
+                                        {item?.recipientRoles?.map(
+                                            (role, index) => (
+                                                <span key={index}>
+                                                    {role}
+                                                    {index !==
+                                                        item.recipientRoles
+                                                            .length -
+                                                            1 && ", "}
+                                                    <br />
+                                                </span>
+                                            )
+                                        )}
                                     </td>
 
                                     <td>{item?.status}</td>
@@ -546,23 +635,70 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                         </div>
 
                         <div>
-                            <label htmlFor="status" className="">
-                                Status
-                            </label>
+                            <span className="">Seen by</span>
 
-                            <select
-                                name="status"
-                                id="status"
+                            <Select
+                                options={users.map((user) => ({
+                                    label: user?.email,
+                                    value: user?._id,
+                                }))}
+                                isMulti
+                                onChange={setSeenBy}
                                 className=""
-                                defaultValue={selectedItem?.status || ""}
-                                required
-                            >
-                                <option value="" disabled>
-                                    Select a status
-                                </option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
+                                placeholder="Search and select seen by"
+                                value={seenBy}
+                            />
+                        </div>
+
+                        <div>
+                            <span className="">Specific users</span>
+
+                            <Select
+                                options={users.map((user) => ({
+                                    label: user?.email,
+                                    value: user?._id,
+                                }))}
+                                isMulti
+                                onChange={setSpecificUsers}
+                                className=""
+                                placeholder="Search and select users"
+                                value={specificUsers}
+                            />
+                        </div>
+
+                        <div>
+                            <span className="">Recipient Roles</span>
+
+                            <Select
+                                options={roleOptions}
+                                isMulti
+                                onChange={setRecipientRoles}
+                                className=""
+                                placeholder="Select recipient roles"
+                                defaultValue={roleOptions.filter((role) =>
+                                    selectedItem?.recipientRoles?.includes(
+                                        role.value
+                                    )
+                                )}
+                            />
+                        </div>
+
+                        <div>
+                            <span className="">Status</span>
+
+                            <Select
+                                options={statusOptions}
+                                onChange={setStatus}
+                                className=""
+                                placeholder="Select status"
+                                defaultValue={
+                                    statusOptions.find(
+                                        (status) =>
+                                            status.value ===
+                                            selectedItem?.status
+                                    ) || null
+                                }
+                            />
                         </div>
 
                         <div>
@@ -620,6 +756,56 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                         <div>
                             <h2>Message</h2>
                             <p>{selectedItem?.message}</p>
+                        </div>
+
+                        <div>
+                            <h2>Seen by</h2>
+                            <div>
+                                {selectedItem?.seenBy?.map((user, index) => (
+                                    <p key={user._id}>
+                                        {user.email}
+                                        {index !==
+                                            selectedItem.seenBy.length - 1 &&
+                                            ", "}
+                                        <br />
+                                    </p>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2>specific users</h2>
+                            <div>
+                                {selectedItem?.specificUsers?.map(
+                                    (user, index) => (
+                                        <p key={user._id}>
+                                            {user.email}
+                                            {index !==
+                                                selectedItem.seenBy.length -
+                                                    1 && ", "}
+                                            <br />
+                                        </p>
+                                    )
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2>recipient roles</h2>
+                            <div>
+                                {selectedItem?.recipientRoles?.map(
+                                    (role, index) => (
+                                        <p key={index}>
+                                            {role}
+                                            {index !==
+                                                selectedItem.recipientRoles
+                                                    .length -
+                                                    1 && ", "}
+                                            <br />
+                                        </p>
+                                    )
+                                )}
+                            </div>
                         </div>
 
                         <div>
