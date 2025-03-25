@@ -417,7 +417,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
                 {/* download csv button */}
                 <DownloadCSVButton
-                    data={blogCategories}
+                    data={filteredItems}
                     filename="blog-categories.csv"
                     selectedColumns={[
                         "_id",

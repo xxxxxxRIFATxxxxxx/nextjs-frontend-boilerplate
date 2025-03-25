@@ -496,7 +496,7 @@ const UserList = ({ initialUsers }) => {
 
                 {/* download csv button */}
                 <DownloadCSVButton
-                    data={users}
+                    data={filteredItems}
                     filename="users.csv"
                     selectedColumns={[
                         "_id",

@@ -563,7 +563,7 @@ const AdminBlogList = ({
 
                 {/* download csv button */}
                 <DownloadCSVButton
-                    data={blogs}
+                    data={filteredItems}
                     filename="blogs.csv"
                     selectedColumns={[
                         "_id",

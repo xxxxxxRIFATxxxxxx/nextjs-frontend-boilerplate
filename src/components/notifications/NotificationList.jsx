@@ -467,7 +467,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
                 {/* download csv button */}
                 <DownloadCSVButton
-                    data={notifications}
+                    data={filteredItems}
                     filename="notifications.csv"
                     selectedColumns={[
                         "_id",
