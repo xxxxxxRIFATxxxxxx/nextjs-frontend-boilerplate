@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { toast } from "react-toastify";
 import { Bell } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
@@ -75,7 +76,7 @@ const NotificationTab = () => {
                             notifications.map((notif) => (
                                 <li
                                     key={notif?._id}
-                                    className="relative p-2 bg-gray-100 rounded-lg text-sm flex flex-col"
+                                    className="relative p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm flex flex-col"
                                 >
                                     {!notif.seenBy.some(
                                         (userObj) => userObj._id === user?._id
@@ -83,13 +84,19 @@ const NotificationTab = () => {
                                         <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                                     )}
 
-                                    <span className="font-medium">
+                                    <Link
+                                        href={notif?.targetUrl}
+                                        className="font-medium"
+                                    >
                                         {notif?.message}
-                                    </span>
+                                    </Link>
 
-                                    <span className="text-xs text-gray-500">
+                                    <Link
+                                        href={notif?.targetUrl}
+                                        className="text-xs text-gray-500"
+                                    >
                                         {formatDateTime(notif?.createdAt)}
-                                    </span>
+                                    </Link>
                                 </li>
                             ))
                         ) : (

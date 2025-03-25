@@ -35,7 +35,11 @@
     border-radius: 10px;
 }
 
-/* tiptap text area remove focus outline */
+/* tiptap */
+.tiptap {
+    min-height: 200px;
+}
+
 .tiptap:focus {
     outline: none !important;
     box-shadow: none !important;

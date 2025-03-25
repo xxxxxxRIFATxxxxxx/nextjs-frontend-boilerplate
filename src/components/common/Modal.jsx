@@ -40,7 +40,7 @@ const Modal = ({ title, isOpen, onClose, width = "max-w-md", children }) => {
                     </div>
 
                     {/* modal body */}
-                    <div className="p-4 max-h-[70vh] overflow-y-auto scrollbar-thin">
+                    <div className="p-4 min-h-[70vh] max-h-[70vh] overflow-y-auto scrollbar-thin">
                         {children}
                     </div>
                 </div>

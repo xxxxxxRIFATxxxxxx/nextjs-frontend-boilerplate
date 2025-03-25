@@ -28,6 +28,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
     const [isAddOrEditModalOpen, setIsAddOrEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleteSelectedModalOpen, setIsDeleteSelectedModalOpen] =
+        useState(false);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -117,6 +119,16 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
         setIsDeleteModalOpen(false);
     };
 
+    // open delete selected confirmation modal
+    const openDeleteSelectedModal = (item) => {
+        setIsDeleteSelectedModalOpen(true);
+    };
+
+    // close delete selected confirmation modal
+    const closeDeleteSelectedModal = () => {
+        setIsDeleteSelectedModalOpen(false);
+    };
+
     // handle item creation or update
     const handleSave = async (e) => {
         e.preventDefault();
@@ -125,6 +137,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
         const seenByIds = seenBy.map((user) => user.value);
         const specificUserIds = specificUsers.map((user) => user.value);
         const recipientRoleValues = recipientRoles.map((role) => role.value);
+        const targetUrl = e.target.targetUrl.value.trim();
         const statusValue = status?.value;
 
         if (selectedItem) {
@@ -133,6 +146,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                 seenBy: seenByIds,
                 specificUsers: specificUserIds,
                 recipientRoles: recipientRoleValues,
+                targetUrl,
                 status: statusValue,
             });
 
@@ -160,6 +174,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                 specificUsers: specificUserIds,
                 recipientRoles: recipientRoleValues,
                 status: statusValue,
+                targetUrl,
             });
 
             if (response?.data) {
@@ -225,6 +240,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
             toast.success(response?.message);
             setSelectedItems([]);
             setSelectAll(false);
+            setIsDeleteSelectedModalOpen(false);
         } else {
             toast.error(response);
         }
@@ -452,7 +468,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                 {/* delete selected button */}
                 <div>
                     {selectedItems.length > 0 && (
-                        <button type="button" onClick={handleBulkDelete}>
+                        <button type="button" onClick={openDeleteSelectedModal}>
                             Delete Selected
                         </button>
                     )}
@@ -473,6 +489,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                         "_id",
                         "message",
                         "recipientRoles",
+                        "targetUrl",
                         "status",
                         "createdAt",
                         "updatedAt",
@@ -504,6 +521,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
                             <th>Recipient Roles</th>
 
+                            <th>Target Url</th>
+
                             <th>Status</th>
 
                             <th>Created</th>
@@ -517,7 +536,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                     <tbody>
                         {filteredItems.length === 0 ? (
                             <tr>
-                                <td colSpan="9" className="text-center">
+                                <td colSpan="10" className="text-center">
                                     No notifications found.
                                 </td>
                             </tr>
@@ -573,6 +592,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                             )
                                         )}
                                     </td>
+
+                                    <td>{item?.targetUrl}</td>
 
                                     <td>{item?.status}</td>
 
@@ -667,7 +688,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                         </div>
 
                         <div>
-                            <span className="">Recipient Roles</span>
+                            <span className="">Recipient roles</span>
 
                             <Select
                                 options={roleOptions}
@@ -680,6 +701,23 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                         role.value
                                     )
                                 )}
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="targetUrl" className="">
+                                Target Url
+                            </label>
+
+                            <input
+                                type="text"
+                                name="targetUrl"
+                                id="targetUrl"
+                                autoComplete="url"
+                                className=""
+                                placeholder="Enter target url"
+                                defaultValue={selectedItem?.targetUrl || ""}
+                                required
                             />
                         </div>
 
@@ -734,6 +772,26 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                     </button>
 
                     <button type="button" onClick={handleDelete}>
+                        {loading ? <Spinner /> : <span>Delete</span>}
+                    </button>
+                </div>
+            </Modal>
+
+            {/* delete selected modal */}
+            <Modal
+                title="Permanently Delete Selected Items"
+                isOpen={isDeleteSelectedModalOpen}
+                onClose={closeDeleteSelectedModal}
+                width="max-w-md"
+            >
+                <div>
+                    <p>Are you sure you want to delete selected items?</p>
+
+                    <button type="button" onClick={closeDeleteSelectedModal}>
+                        Cancel
+                    </button>
+
+                    <button type="button" onClick={handleBulkDelete}>
                         {loading ? <Spinner /> : <span>Delete</span>}
                     </button>
                 </div>

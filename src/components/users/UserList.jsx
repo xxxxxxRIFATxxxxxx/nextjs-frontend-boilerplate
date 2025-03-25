@@ -32,6 +32,8 @@ const UserList = ({ initialUsers }) => {
 
     const [isAddOrEditModalOpen, setIsAddOrEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleteSelectedModalOpen, setIsDeleteSelectedModalOpen] =
+        useState(false);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -111,6 +113,16 @@ const UserList = ({ initialUsers }) => {
     const closeDeleteModal = () => {
         removeExixtingItems();
         setIsDeleteModalOpen(false);
+    };
+
+    // open delete selected confirmation modal
+    const openDeleteSelectedModal = (item) => {
+        setIsDeleteSelectedModalOpen(true);
+    };
+
+    // close delete selected confirmation modal
+    const closeDeleteSelectedModal = () => {
+        setIsDeleteSelectedModalOpen(false);
     };
 
     // handle item creation or update
@@ -251,6 +263,7 @@ const UserList = ({ initialUsers }) => {
             toast.success(response?.message);
             setSelectedItems([]);
             setSelectAll(false);
+            setIsDeleteSelectedModalOpen(false);
         } else {
             toast.error(response);
         }
@@ -481,7 +494,7 @@ const UserList = ({ initialUsers }) => {
                 {/* delete selected button */}
                 <div>
                     {selectedItems.length > 0 && (
-                        <button type="button" onClick={handleBulkDelete}>
+                        <button type="button" onClick={openDeleteSelectedModal}>
                             Delete Selected
                         </button>
                     )}
@@ -989,6 +1002,26 @@ const UserList = ({ initialUsers }) => {
                     </button>
 
                     <button type="button" onClick={handleDelete}>
+                        {loading ? <Spinner /> : <span>Delete</span>}
+                    </button>
+                </div>
+            </Modal>
+
+            {/* delete selected modal */}
+            <Modal
+                title="Permanently Delete Selected Items"
+                isOpen={isDeleteSelectedModalOpen}
+                onClose={closeDeleteSelectedModal}
+                width="max-w-md"
+            >
+                <div>
+                    <p>Are you sure you want to delete selected items?</p>
+
+                    <button type="button" onClick={closeDeleteSelectedModal}>
+                        Cancel
+                    </button>
+
+                    <button type="button" onClick={handleBulkDelete}>
                         {loading ? <Spinner /> : <span>Delete</span>}
                     </button>
                 </div>
