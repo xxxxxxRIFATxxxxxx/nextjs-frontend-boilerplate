@@ -765,6 +765,7 @@ const AdminBlogList = ({
                                 className=""
                                 placeholder="Search and select category"
                                 value={category}
+                                required
                             />
                         </div>
 
@@ -780,6 +781,7 @@ const AdminBlogList = ({
                                 className=""
                                 placeholder="Search and select user"
                                 value={createdBy}
+                                required
                             />
                         </div>
 
@@ -884,6 +886,7 @@ const AdminBlogList = ({
                                             selectedItem?.status
                                     ) || null
                                 }
+                                required
                             />
                         </div>
 

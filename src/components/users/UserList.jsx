@@ -804,6 +804,7 @@ const UserList = ({ initialUsers }) => {
                                             role.value === selectedItem?.role
                                     ) || null
                                 }
+                                required
                             />
                         </div>
 
@@ -822,6 +823,7 @@ const UserList = ({ initialUsers }) => {
                                             selectedItem?.status
                                     ) || null
                                 }
+                                required
                             />
                         </div>
 

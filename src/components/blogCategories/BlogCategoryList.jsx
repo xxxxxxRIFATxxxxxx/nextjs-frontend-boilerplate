@@ -601,6 +601,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                                             selectedItem?.status
                                     ) || null
                                 }
+                                required
                             />
                         </div>
 

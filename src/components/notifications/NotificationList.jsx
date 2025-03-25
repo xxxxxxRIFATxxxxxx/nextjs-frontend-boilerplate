@@ -701,6 +701,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                         role.value
                                     )
                                 )}
+                                required
                             />
                         </div>
 
@@ -736,6 +737,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                             selectedItem?.status
                                     ) || null
                                 }
+                                required
                             />
                         </div>
 
@@ -864,6 +866,11 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                     )
                                 )}
                             </div>
+                        </div>
+
+                        <div>
+                            <h2>Target url</h2>
+                            <p>{selectedItem?.targetUrl}</p>
                         </div>
 
                         <div>
