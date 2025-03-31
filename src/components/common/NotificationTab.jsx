@@ -29,21 +29,26 @@ const NotificationTab = () => {
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // mark all unseen notifications as seen when dropdown opens
-    useEffect(() => {
-        if (isOpen) {
-            markAsSeen().then((response) => {
-                if (!response?.message) {
-                    toast.error(response);
-                }
-            });
-        }
-    }, [isOpen]);
-
     // count unseen notifications
     const unseenCount = notifications.filter(
-        (notif) => !notif.seenBy.some((userObj) => userObj._id === user?._id) // Check populated objects
+        (notif) => !notif.seenBy.some((userObj) => userObj._id === user?._id)
     ).length;
+
+    // mark a single notification as seen
+    const handleNotificationClick = async (notifId) => {
+        const response = await markAsSeen(notifId);
+        if (!response?.message) {
+            toast.error(response);
+        }
+    };
+
+    // mark all notifications as seen
+    const handleMarkAllAsSeen = async () => {
+        const response = await markAsSeen();
+        if (!response?.message) {
+            toast.error(response);
+        }
+    };
 
     return (
         <div className="relative" ref={dropdownRef}>
@@ -68,15 +73,26 @@ const NotificationTab = () => {
                 <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-3 z-50">
                     <div className="mb-2 flex justify-between items-center">
                         <span className="font-semibold">Notifications</span>
+                        {unseenCount > 0 && (
+                            <button
+                                onClick={handleMarkAllAsSeen}
+                                className="text-xs text-blue-500 hover:underline cursor-pointer"
+                            >
+                                Mark all as read
+                            </button>
+                        )}
                     </div>
 
-                    {/* notification list with scroll */}
+                    {/* notification list */}
                     <ul className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                         {notifications.length > 0 ? (
                             notifications.map((notif) => (
                                 <li
                                     key={notif?._id}
                                     className="relative p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm flex flex-col"
+                                    onClick={() =>
+                                        handleNotificationClick(notif._id)
+                                    }
                                 >
                                     {!notif.seenBy.some(
                                         (userObj) => userObj._id === user?._id
