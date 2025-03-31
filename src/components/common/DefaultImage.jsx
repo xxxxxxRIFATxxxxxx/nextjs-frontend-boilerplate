@@ -1,10 +1,19 @@
 import { Image } from "lucide-react";
 
-const DefaultImage = ({ width, height, iconSize, onClick }) => {
+const DefaultImage = ({
+    width,
+    height,
+    iconSize,
+    onClick,
+    onDragOver,
+    onDrop,
+}) => {
     return (
         <div
-            className={`flex items-center justify-center bg-gray-100 ${width} ${height}`}
+            className={`flex items-center justify-center bg-gray-100 cursor-pointer ${width} ${height}`}
             onClick={onClick}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
         >
             <Image width={iconSize} height={iconSize} />
         </div>

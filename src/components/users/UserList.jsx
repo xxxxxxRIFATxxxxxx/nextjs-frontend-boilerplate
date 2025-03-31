@@ -136,7 +136,6 @@ const UserList = ({ initialUsers }) => {
         const password = e.target.password.value.trim();
         const roleValue = role?.value;
         const statusValue = status?.value;
-        const image = e.target.image.files[0];
         const dateOfBirth = e.target.dateOfBirth.value
             ? new Date(e.target.dateOfBirth.value)
             : null;
@@ -148,8 +147,8 @@ const UserList = ({ initialUsers }) => {
 
         let imageUrl = selectedItem?.image;
 
-        if (image) {
-            const responseFile = await uploadSingleFile(image);
+        if (userImage) {
+            const responseFile = await uploadSingleFile(userImage);
 
             if (responseFile?.error) {
                 return toast.error(responseFile.error);
@@ -280,6 +279,15 @@ const UserList = ({ initialUsers }) => {
     // for preview user image
     const handleUserImageChange = (e) => {
         const file = e.target.files[0];
+        if (file) {
+            setUserImage(file);
+        }
+    };
+
+    // for drag and drop user image
+    const handleUserImageDrop = (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
         if (file) {
             setUserImage(file);
         }
@@ -844,6 +852,8 @@ const UserList = ({ initialUsers }) => {
                                     height={200}
                                     alt="user image"
                                     onClick={() => userImageRef.current.click()}
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={handleUserImageDrop}
                                 />
                             ) : (
                                 <DefaultUserIcon
@@ -851,6 +861,8 @@ const UserList = ({ initialUsers }) => {
                                     height="h-[200px]"
                                     iconSize={100}
                                     onClick={() => userImageRef.current.click()}
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={handleUserImageDrop}
                                 />
                             )}
 

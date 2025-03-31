@@ -13,6 +13,7 @@ import Spinner from "@/components/common/Spinner";
 import DefaultImage from "@/components/common/DefaultImage";
 import formatDateTime from "@/helpers/formatDateTime";
 import uploadSingleFile from "@/helpers/uploadSingleFile";
+import uploadMultipleFiles from "@/helpers/uploadMultipleFiles";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
 const socket = io(process.env.NEXT_PUBLIC_API_URL);
@@ -48,8 +49,10 @@ const AdminBlogList = ({
     const [description, setDescription] = useState("");
     const [thumbnailImage, setThumbnailImage] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
+    const [images, setImages] = useState([]);
     const thumbnailImageRef = useRef(null);
     const coverImageRef = useRef(null);
+    const imagesRef = useRef(null);
     const [status, setStatus] = useState(null);
     const statusOptions = [
         { label: "Active", value: "active" },
@@ -158,15 +161,13 @@ const AdminBlogList = ({
 
         const title = e.target.title.value.trim();
         const categoryId = category?.value;
-        const thumbnail = e.target.thumbnail.files[0];
-        const coverImage = e.target.coverImage.files[0];
         const createdById = createdBy?.value;
         const statusValue = status?.value;
 
         let thumbnailUrl = selectedItem?.thumbnail;
 
-        if (thumbnail) {
-            const responseFile = await uploadSingleFile(thumbnail);
+        if (thumbnailImage) {
+            const responseFile = await uploadSingleFile(thumbnailImage);
 
             if (responseFile?.error) {
                 return toast.error(responseFile.error);
@@ -187,6 +188,18 @@ const AdminBlogList = ({
             }
         }
 
+        let imageUrls = selectedItem?.images;
+
+        if (images.length > 0) {
+            const responseFiles = await uploadMultipleFiles(images);
+
+            if (responseFiles?.error) {
+                return toast.error(responseFiles.error);
+            } else {
+                imageUrls = responseFiles.data.fileUrls;
+            }
+        }
+
         if (selectedItem) {
             const response = await updateItem(selectedItem._id, {
                 title,
@@ -194,6 +207,7 @@ const AdminBlogList = ({
                 category: categoryId,
                 thumbnail: thumbnailUrl,
                 coverImage: coverImageUrl,
+                images: imageUrls,
                 createdBy: createdById,
                 status: statusValue,
             });
@@ -229,6 +243,7 @@ const AdminBlogList = ({
                 category: categoryId,
                 thumbnail: thumbnailUrl,
                 coverImage: coverImageUrl,
+                images: imageUrls,
                 createdBy: createdById,
                 status: statusValue,
             });
@@ -313,6 +328,7 @@ const AdminBlogList = ({
         setCategory(null);
         setThumbnailImage(null);
         setCoverImage(null);
+        setImages([]);
         setCreatedBy(null);
         setStatus(null);
     };
@@ -325,12 +341,48 @@ const AdminBlogList = ({
         }
     };
 
+    // for drag and drop thumbnail image
+    const handleThumbnailImageDrop = (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            setThumbnailImage(file);
+        }
+    };
+
     // for preview cover image
     const handleCoverImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setCoverImage(file);
         }
+    };
+
+    // for drag and drop cover image
+    const handleCoverImageDrop = (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            setCoverImage(file);
+        }
+    };
+
+    // for preview images
+    const handleImagesChange = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) setImages([...images, ...files]);
+    };
+
+    // for drag and drop images
+    const handleImagesDrop = (e) => {
+        e.preventDefault();
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0) setImages([...images, ...files]);
+    };
+
+    // remove an image from preview
+    const removeImageFromPreview = (index) => {
+        setImages(images.filter((_, i) => i !== index));
     };
 
     // filtering logic
@@ -799,13 +851,15 @@ const AdminBlogList = ({
                                               )
                                             : selectedItem?.thumbnail
                                     }
-                                    className="w-full"
+                                    className="w-full cursor-pointer"
                                     width={1000}
                                     height={1000}
                                     alt="thumbnail image"
                                     onClick={() =>
                                         thumbnailImageRef.current.click()
                                     }
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={handleThumbnailImageDrop}
                                 />
                             ) : (
                                 <DefaultImage
@@ -815,6 +869,8 @@ const AdminBlogList = ({
                                     onClick={() =>
                                         thumbnailImageRef.current.click()
                                     }
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={handleThumbnailImageDrop}
                                 />
                             )}
 
@@ -841,13 +897,15 @@ const AdminBlogList = ({
                                             ? URL.createObjectURL(coverImage)
                                             : selectedItem?.coverImage
                                     }
-                                    className="w-full"
+                                    className="w-full cursor-pointer"
                                     width={1000}
                                     height={1000}
                                     alt="cover image"
                                     onClick={() =>
                                         coverImageRef.current.click()
                                     }
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={handleCoverImageDrop}
                                 />
                             ) : (
                                 <DefaultImage
@@ -857,6 +915,8 @@ const AdminBlogList = ({
                                     onClick={() =>
                                         coverImageRef.current.click()
                                     }
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={handleCoverImageDrop}
                                 />
                             )}
 
@@ -868,6 +928,83 @@ const AdminBlogList = ({
                                 accept="image/*"
                                 onChange={handleCoverImageChange}
                                 ref={coverImageRef}
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="images" className="">
+                                Images
+                            </label>
+
+                            {/* show existing images if they exist and no new images are uploaded yet */}
+                            {selectedItem?.images?.length > 0 &&
+                                images?.length === 0 && (
+                                    <div className="grid grid-cols-3 gap-4">
+                                        {selectedItem?.images?.map(
+                                            (image, index) => (
+                                                <div key={index}>
+                                                    <Image
+                                                        src={image}
+                                                        className="w-auto h-auto object-cover cursor-pointer"
+                                                        width={500}
+                                                        height={500}
+                                                        alt="image"
+                                                    />
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                )}
+
+                            {/* show newly uploaded images these will replace existing ones upon submission */}
+                            {images?.length > 0 && (
+                                <div className="grid grid-cols-3 gap-4">
+                                    {images?.map((image, index) => (
+                                        <div key={index} className="relative">
+                                            <Image
+                                                src={URL.createObjectURL(image)}
+                                                className="w-auto h-auto object-cover cursor-pointer"
+                                                width={500}
+                                                height={500}
+                                                alt="image"
+                                            />
+
+                                            <button
+                                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full cursor-pointer "
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    removeImageFromPreview(
+                                                        index
+                                                    );
+                                                }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            <DefaultImage
+                                width="w-full"
+                                height="h-[400px]"
+                                iconSize={100}
+                                onClick={() => imagesRef.current.click()}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={handleImagesDrop}
+                            />
+
+                            {/* file input for new image uploads */}
+                            <input
+                                type="file"
+                                name="images"
+                                id="images"
+                                className=""
+                                accept="image/*"
+                                onChange={handleImagesChange}
+                                ref={imagesRef}
+                                multiple
                             />
                         </div>
 

@@ -33,7 +33,6 @@ const Profile = () => {
         const currentPassword = e.target.currentPassword.value.trim();
         const newPassword = e.target.newPassword.value.trim();
         const confirmNewPassword = e.target.confirmNewPassword.value.trim();
-        const image = e.target.image.files[0];
         const dateOfBirth = e.target.dateOfBirth.value
             ? new Date(e.target.dateOfBirth.value)
             : null;
@@ -52,8 +51,8 @@ const Profile = () => {
 
         let imageUrl = user?.image;
 
-        if (image) {
-            const responseFile = await uploadSingleFile(image);
+        if (userImage) {
+            const responseFile = await uploadSingleFile(userImage);
 
             if (responseFile?.error) {
                 setLoading(false);
@@ -110,6 +109,15 @@ const Profile = () => {
     // for preview user image
     const handleUserImageChange = (e) => {
         const file = e.target.files[0];
+        if (file) {
+            setUserImage(file);
+        }
+    };
+
+    // for drag and drop user image
+    const handleUserImageDrop = (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
         if (file) {
             setUserImage(file);
         }
@@ -330,6 +338,10 @@ const Profile = () => {
                                             onClick={() =>
                                                 userImageRef.current.click()
                                             }
+                                            onDragOver={(e) =>
+                                                e.preventDefault()
+                                            }
+                                            onDrop={handleUserImageDrop}
                                         />
                                     ) : (
                                         <DefaultUserIcon
@@ -339,6 +351,10 @@ const Profile = () => {
                                             onClick={() =>
                                                 userImageRef.current.click()
                                             }
+                                            onDragOver={(e) =>
+                                                e.preventDefault()
+                                            }
+                                            onDrop={handleUserImageDrop}
                                         />
                                     )}
 
