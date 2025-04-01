@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { io } from "socket.io-client";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import useCrud from "@/hooks/useCrud";
@@ -691,6 +691,7 @@ const UserList = ({ initialUsers }) => {
                                     <td className="p-[18px] relative">
                                         <button
                                             type="button"
+                                            className="cursor-pointer"
                                             onClick={() =>
                                                 openAddOrEditModal(item)
                                             }
@@ -700,6 +701,15 @@ const UserList = ({ initialUsers }) => {
 
                                         <button
                                             type="button"
+                                            className="cursor-pointer"
+                                            onClick={() => openViewModal(item)}
+                                        >
+                                            <Eye className="w-4 h-4" />
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="cursor-pointer"
                                             onClick={() =>
                                                 openDeleteModal(item)
                                             }

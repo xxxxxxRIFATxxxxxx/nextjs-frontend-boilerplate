@@ -45,11 +45,11 @@ const Login = () => {
                                 htmlFor="emailOrPhoneOrUsername"
                                 className=""
                             >
-                                Email
+                                Email Or Phone Or Username
                             </label>
 
                             <input
-                                type="email"
+                                type="text"
                                 name="emailOrPhoneOrUsername"
                                 id="emailOrPhoneOrUsername"
                                 autoComplete="email"

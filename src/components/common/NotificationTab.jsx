@@ -9,7 +9,11 @@ import formatDateTime from "@/helpers/formatDateTime";
 
 const NotificationTab = () => {
     const { user } = useAuth();
-    const { notifications, markAsSeen } = useNotifications();
+    const {
+        notifications,
+        markSingleNotificationAsSeen,
+        markMultipleNotificationAsSeen,
+    } = useNotifications();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -36,7 +40,7 @@ const NotificationTab = () => {
 
     // mark a single notification as seen
     const handleNotificationClick = async (notifId) => {
-        const response = await markAsSeen(notifId);
+        const response = await markSingleNotificationAsSeen(notifId);
         if (!response?.message) {
             toast.error(response);
         }
@@ -44,7 +48,7 @@ const NotificationTab = () => {
 
     // mark all notifications as seen
     const handleMarkAllAsSeen = async () => {
-        const response = await markAsSeen();
+        const response = await markMultipleNotificationAsSeen();
         if (!response?.message) {
             toast.error(response);
         }

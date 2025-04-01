@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import useCrud from "@/hooks/useCrud";
@@ -604,6 +604,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                     <td className="p-[18px] relative">
                                         <button
                                             type="button"
+                                            className="cursor-pointer"
                                             onClick={() =>
                                                 openAddOrEditModal(item)
                                             }
@@ -613,6 +614,15 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
                                         <button
                                             type="button"
+                                            className="cursor-pointer"
+                                            onClick={() => openViewModal(item)}
+                                        >
+                                            <Eye className="w-4 h-4" />
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="cursor-pointer"
                                             onClick={() =>
                                                 openDeleteModal(item)
                                             }
