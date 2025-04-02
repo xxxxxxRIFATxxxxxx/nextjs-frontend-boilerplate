@@ -1,7 +1,7 @@
 import Layout from "@/components/common/Layout";
-import NotificationList from "@/components/notifications/NotificationList";
 import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
+import NotificationList from "@/components/notifications/NotificationList";
 import fetchData from "@/helpers/fetchData";
 
 const Notification = async () => {

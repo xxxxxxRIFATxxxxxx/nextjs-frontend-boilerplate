@@ -1,6 +1,7 @@
 import Layout from "@/components/common/Layout";
-import UserBlogList from "@/components/blogs/UserBlogList";
+import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
+import UserBlogList from "@/components/blogs/UserBlogList";
 import fetchData from "@/helpers/fetchData";
 
 const Blogs = async () => {
@@ -26,32 +27,36 @@ const Blogs = async () => {
     const usersError = usersResponse?.error || null;
 
     return (
-        <Layout>
-            {/* error message */}
-            <section>
-                {(blogsError || blogCategoriesError || usersError) && (
-                    <Error
-                        errorMessage={[
-                            blogsError,
-                            blogCategoriesError,
-                            usersError,
-                        ]
-                            .filter(Boolean)
-                            .join("\n")}
-                    />
-                )}
-            </section>
-
-            {!blogsError && !blogCategoriesError && !usersError && (
+        <PrivateRoute
+            allowedRoles={["super_admin", "admin", "moderator", "user"]}
+        >
+            <Layout>
+                {/* error message */}
                 <section>
-                    <UserBlogList
-                        initialBlogs={initialBlogs}
-                        initialBlogCategories={initialBlogCategories}
-                        initialUsers={initialUsers}
-                    />
+                    {(blogsError || blogCategoriesError || usersError) && (
+                        <Error
+                            errorMessage={[
+                                blogsError,
+                                blogCategoriesError,
+                                usersError,
+                            ]
+                                .filter(Boolean)
+                                .join("\n")}
+                        />
+                    )}
                 </section>
-            )}
-        </Layout>
+
+                {!blogsError && !blogCategoriesError && !usersError && (
+                    <section>
+                        <UserBlogList
+                            initialBlogs={initialBlogs}
+                            initialBlogCategories={initialBlogCategories}
+                            initialUsers={initialUsers}
+                        />
+                    </section>
+                )}
+            </Layout>
+        </PrivateRoute>
     );
 };
 

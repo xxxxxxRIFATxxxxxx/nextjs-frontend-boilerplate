@@ -1,4 +1,5 @@
 import Layout from "@/components/common/Layout";
+import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
 import BlogDetailsClient from "@/components/blogs/BlogDetailsClient";
 import fetchData from "@/helpers/fetchData";
@@ -34,22 +35,31 @@ const BlogDetails = async ({ params }) => {
     const blogError = blogResponse?.error || null;
 
     return (
-        <Layout>
-            {/* error message */}
-            <section>
-                {blogError && (
-                    <Error
-                        errorMessage={[blogError].filter(Boolean).join("\n")}
-                    />
-                )}
-            </section>
-
-            {!blogError && (
+        <PrivateRoute
+            allowedRoles={["super_admin", "admin", "moderator", "user"]}
+        >
+            <Layout>
+                {/* error message */}
                 <section>
-                    <BlogDetailsClient initialBlog={initialBlog} slug={slug} />
+                    {blogError && (
+                        <Error
+                            errorMessage={[blogError]
+                                .filter(Boolean)
+                                .join("\n")}
+                        />
+                    )}
                 </section>
-            )}
-        </Layout>
+
+                {!blogError && (
+                    <section>
+                        <BlogDetailsClient
+                            initialBlog={initialBlog}
+                            slug={slug}
+                        />
+                    </section>
+                )}
+            </Layout>
+        </PrivateRoute>
     );
 };
 

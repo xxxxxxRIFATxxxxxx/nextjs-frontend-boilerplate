@@ -1,6 +1,6 @@
 import Layout from "@/components/common/Layout";
-import UserList from "@/components/users/UserList";
 import PrivateRoute from "@/components/common/PrivateRoute";
+import UserList from "@/components/users/UserList";
 import Error from "@/components/common/Error";
 import fetchData from "@/helpers/fetchData";
 

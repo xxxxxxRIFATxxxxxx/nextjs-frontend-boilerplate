@@ -1,7 +1,7 @@
 import Layout from "@/components/common/Layout";
-import AdminBlogList from "@/components/blogs/AdminBlogList";
 import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
+import AdminBlogList from "@/components/blogs/AdminBlogList";
 import fetchData from "@/helpers/fetchData";
 
 const Admin = async () => {

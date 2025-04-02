@@ -188,15 +188,19 @@ const AdminBlogList = ({
             }
         }
 
-        let imageUrls = selectedItem?.images;
+        let imageUrls = images;
 
         if (images.length > 0) {
-            const responseFiles = await uploadMultipleFiles(images);
+            const files = images.filter((image) => image instanceof File);
+            const urls = images.filter((image) => typeof image === "string");
 
-            if (responseFiles?.error) {
-                return toast.error(responseFiles.error);
-            } else {
-                imageUrls = responseFiles.data.fileUrls;
+            if (files.length > 0) {
+                const responseFiles = await uploadMultipleFiles(files);
+                if (responseFiles?.error) {
+                    return toast.error(responseFiles.error);
+                } else {
+                    imageUrls = [...urls, ...responseFiles.data.fileUrls];
+                }
             }
         }
 
@@ -369,8 +373,9 @@ const AdminBlogList = ({
 
     // for preview images
     const handleImagesChange = (e) => {
+        if (!e.target.files) return;
         const files = Array.from(e.target.files);
-        if (files.length > 0) setImages([...images, ...files]);
+        setImages((prevImages) => [...(prevImages || []), ...files]);
     };
 
     // for drag and drop images
@@ -452,6 +457,8 @@ const AdminBlogList = ({
                   }
                 : null
         );
+
+        setImages(selectedItem?.images);
 
         setCreatedBy(
             users.find((user) => user?._id === selectedItem?.createdBy?._id)
@@ -947,7 +954,7 @@ const AdminBlogList = ({
                             </label>
 
                             {/* show existing images if they exist and no new images are uploaded yet */}
-                            {selectedItem?.images?.length > 0 &&
+                            {/* {selectedItem?.images?.length > 0 &&
                                 images?.length === 0 && (
                                     <div className="grid grid-cols-3 gap-4">
                                         {selectedItem?.images?.map(
@@ -964,7 +971,7 @@ const AdminBlogList = ({
                                             )
                                         )}
                                     </div>
-                                )}
+                                )} */}
 
                             {/* show newly uploaded images these will replace existing ones upon submission */}
                             {images?.length > 0 && (
@@ -972,7 +979,13 @@ const AdminBlogList = ({
                                     {images?.map((image, index) => (
                                         <div key={index} className="relative">
                                             <Image
-                                                src={URL.createObjectURL(image)}
+                                                src={
+                                                    image instanceof File
+                                                        ? URL.createObjectURL(
+                                                              image
+                                                          )
+                                                        : image
+                                                }
                                                 className="w-auto h-auto object-cover cursor-pointer"
                                                 width={500}
                                                 height={500}

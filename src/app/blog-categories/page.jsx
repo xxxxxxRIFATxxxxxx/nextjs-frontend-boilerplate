@@ -1,7 +1,7 @@
 import Layout from "@/components/common/Layout";
-import BlogCategoryList from "@/components/blogCategories/BlogCategoryList";
 import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
+import BlogCategoryList from "@/components/blogCategories/BlogCategoryList";
 import fetchData from "@/helpers/fetchData";
 
 const BlogCategories = async () => {
