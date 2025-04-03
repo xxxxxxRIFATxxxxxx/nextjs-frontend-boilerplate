@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { io } from "socket.io-client";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import useCrud from "@/hooks/useCrud";
@@ -10,7 +10,7 @@ import Modal from "@/components/common/Modal";
 import TextEditor from "@/components/common/TextEditor";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
-import DefaultImage from "@/components/common/DefaultImage";
+import DefaultFile from "@/components/common/DefaultFile";
 import formatDateTime from "@/helpers/formatDateTime";
 import uploadSingleFile from "@/helpers/uploadSingleFile";
 import uploadMultipleFiles from "@/helpers/uploadMultipleFiles";
@@ -404,6 +404,7 @@ const AdminBlogList = ({
                 [
                     item?._id?.toString(),
                     item?.title,
+                    item?.slug,
                     item?.category?.name,
                     item?.status,
                     item?.createdBy?.fullName,
@@ -647,6 +648,7 @@ const AdminBlogList = ({
                         "category_name",
                         "thumbnail",
                         "coverImage",
+                        "images",
                         "createdBy_fullName",
                         "status",
                         "createdAt",
@@ -829,6 +831,8 @@ const AdminBlogList = ({
                             <span className="">Category</span>
 
                             <Select
+                                name="category"
+                                id="category"
                                 options={blogCategories.map((blogCategory) => ({
                                     value: blogCategory?._id,
                                     label: blogCategory?.name,
@@ -845,6 +849,8 @@ const AdminBlogList = ({
                             <span className="">Created By</span>
 
                             <Select
+                                name="createdBy"
+                                id="createdBy"
                                 options={users.map((user) => ({
                                     label: user?.email,
                                     value: user?._id,
@@ -882,7 +888,7 @@ const AdminBlogList = ({
                                     onDrop={handleThumbnailImageDrop}
                                 />
                             ) : (
-                                <DefaultImage
+                                <DefaultFile
                                     width="w-full"
                                     height="h-[400px]"
                                     iconSize={100}
@@ -928,7 +934,7 @@ const AdminBlogList = ({
                                     onDrop={handleCoverImageDrop}
                                 />
                             ) : (
-                                <DefaultImage
+                                <DefaultFile
                                     width="w-full"
                                     height="h-[400px]"
                                     iconSize={100}
@@ -984,14 +990,14 @@ const AdminBlogList = ({
                                                     );
                                                 }}
                                             >
-                                                ✕
+                                                <X className="w-4 h-4" />
                                             </button>
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            <DefaultImage
+                            <DefaultFile
                                 width="w-full"
                                 height="h-[400px]"
                                 iconSize={100}
@@ -1025,6 +1031,8 @@ const AdminBlogList = ({
                             <span className="">Status</span>
 
                             <Select
+                                name="status"
+                                id="status"
                                 options={statusOptions}
                                 onChange={setStatus}
                                 className=""
@@ -1109,7 +1117,6 @@ const AdminBlogList = ({
                     <div>
                         <div>
                             <h2>Thumbnail</h2>
-
                             <Image
                                 src={selectedItem?.thumbnail}
                                 className="w-auto h-auto"
@@ -1121,7 +1128,6 @@ const AdminBlogList = ({
 
                         <div>
                             <h2>Cover Image</h2>
-
                             <Image
                                 src={selectedItem?.coverImage}
                                 className="w-auto h-auto"
@@ -1129,6 +1135,22 @@ const AdminBlogList = ({
                                 height={500}
                                 alt="cover image"
                             />
+                        </div>
+
+                        <div>
+                            <h2>Images</h2>
+                            <div className="grid grid-cols1 md:grid-cols-2 gap-4">
+                                {selectedItem?.images?.map((image, index) => (
+                                    <Image
+                                        key={index}
+                                        src={image}
+                                        className="w-auto h-auto"
+                                        width={500}
+                                        height={500}
+                                        alt="image"
+                                    />
+                                ))}
+                            </div>
                         </div>
 
                         <div>

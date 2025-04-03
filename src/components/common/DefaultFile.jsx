@@ -1,6 +1,6 @@
-import { Image } from "lucide-react";
+import { File } from "lucide-react";
 
-const DefaultImage = ({
+const DefaultFile = ({
     width,
     height,
     iconSize,
@@ -15,9 +15,9 @@ const DefaultImage = ({
             onDragOver={onDragOver}
             onDrop={onDrop}
         >
-            <Image width={iconSize} height={iconSize} />
+            <File width={iconSize} height={iconSize} />
         </div>
     );
 };
 
-export default DefaultImage;
+export default DefaultFile;

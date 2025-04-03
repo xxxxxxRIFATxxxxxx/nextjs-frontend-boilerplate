@@ -1,15 +1,21 @@
+import Cookies from "js-cookie";
+
 const uploadSingleFile = async (selectedFile) => {
+    const token = Cookies.get(`${process.env.NEXT_PUBLIC_APP_NAME}_token`);
+
+    const headers = {
+        Authorization: `Bearer ${token}`,
+    };
+
     try {
         const formData = new FormData();
         formData.append("file", selectedFile);
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_FILE_STORAGE_SERVER_API_URL}/api/uploads/single`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/uploads/single`,
             {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_FILE_STORAGE_SERVER_PASSWORD}`,
-                },
+                headers,
                 body: formData,
             }
         );

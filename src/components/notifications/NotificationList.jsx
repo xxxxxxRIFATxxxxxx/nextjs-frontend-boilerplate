@@ -133,6 +133,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
     const handleSave = async (e) => {
         e.preventDefault();
 
+        const title = e.target.title.value.trim();
         const message = e.target.message.value.trim();
         const seenByIds = seenBy.map((user) => user?.value);
         const specificUserIds = specificUsers.map((user) => user?.value);
@@ -142,6 +143,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
         if (selectedItem) {
             const response = await updateItem(selectedItem?._id, {
+                title,
                 message,
                 seenBy: seenByIds,
                 specificUsers: specificUserIds,
@@ -169,6 +171,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
             }
         } else {
             const response = await createItem({
+                title,
                 message,
                 seenBy: seenByIds,
                 specificUsers: specificUserIds,
@@ -263,7 +266,13 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
         if (search) {
             const searchLower = search.toLowerCase();
             filtered = filtered.filter((item) =>
-                [item?._id?.toString(), item?.message, item?.status]
+                [
+                    item?._id?.toString(),
+                    item?.title,
+                    item?.slug,
+                    item?.message,
+                    item?.status,
+                ]
                     .map((field) => field?.toLowerCase() ?? "")
                     .some((field) => field?.includes(searchLower))
             );
@@ -487,6 +496,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                     filename="notifications.csv"
                     selectedColumns={[
                         "_id",
+                        "title",
+                        "slug",
                         "message",
                         "recipientRoles",
                         "targetUrl",
@@ -517,7 +528,13 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
                             <th>Id</th>
 
+                            <th>Title</th>
+
+                            <th>Slug</th>
+
                             <th>Message</th>
+
+                            <th>Specific Users</th>
 
                             <th>Recipient Roles</th>
 
@@ -536,7 +553,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                     <tbody>
                         {filteredItems?.length === 0 ? (
                             <tr>
-                                <td colSpan="10" className="text-center">
+                                <td colSpan="13" className="text-center">
                                     No notifications found.
                                 </td>
                             </tr>
@@ -574,21 +591,35 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                             className="hover:underline cursor-pointer"
                                             onClick={() => openViewModal(item)}
                                         >
+                                            {item?.title}
+                                        </span>
+                                    </td>
+
+                                    <td>{item?.slug}</td>
+
+                                    <td>
+                                        <span
+                                            className="hover:underline cursor-pointer"
+                                            onClick={() => openViewModal(item)}
+                                        >
                                             {item?.message}
                                         </span>
                                     </td>
 
-                                    <td>
+                                    <td className="grid grid-cols-1">
+                                        {item?.specificUsers?.map(
+                                            (user, index) => (
+                                                <span key={index}>
+                                                    {user?.email}
+                                                </span>
+                                            )
+                                        )}
+                                    </td>
+
+                                    <td className="grid grid-cols-1">
                                         {item?.recipientRoles?.map(
                                             (role, index) => (
-                                                <span key={index}>
-                                                    {role}
-                                                    {index !==
-                                                        item.recipientRoles
-                                                            .length -
-                                                            1 && ", "}
-                                                    <br />
-                                                </span>
+                                                <span key={index}>{role}</span>
                                             )
                                         )}
                                     </td>
@@ -649,6 +680,23 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                 <div>
                     <form onSubmit={handleSave}>
                         <div>
+                            <label htmlFor="title" className="">
+                                Title
+                            </label>
+
+                            <input
+                                type="text"
+                                name="title"
+                                id="title"
+                                autoComplete="off"
+                                className=""
+                                placeholder="Enter title"
+                                defaultValue={selectedItem?.title || ""}
+                                required
+                            />
+                        </div>
+
+                        <div>
                             <label htmlFor="message" className="">
                                 Message
                             </label>
@@ -669,6 +717,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                             <span className="">Seen by</span>
 
                             <Select
+                                name="seenBy"
+                                id="seenBy"
                                 options={users.map((user) => ({
                                     label: user?.email,
                                     value: user?._id,
@@ -685,6 +735,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                             <span className="">Specific users</span>
 
                             <Select
+                                name="specificUsers"
+                                id="specificUsers"
                                 options={users.map((user) => ({
                                     label: user?.email,
                                     value: user?._id,
@@ -701,6 +753,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                             <span className="">Recipient roles</span>
 
                             <Select
+                                name="recipientRoles"
+                                id="recipientRoles"
                                 options={roleOptions}
                                 isMulti
                                 onChange={setRecipientRoles}
@@ -736,6 +790,8 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                             <span className="">Status</span>
 
                             <Select
+                                name="status"
+                                id="status"
                                 options={statusOptions}
                                 onChange={setStatus}
                                 className=""
@@ -824,37 +880,37 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                         </div>
 
                         <div>
+                            <h2>Title</h2>
+                            <p>{selectedItem?.title}</p>
+                        </div>
+
+                        <div>
+                            <h2>Slug</h2>
+                            <p>{selectedItem?.slug}</p>
+                        </div>
+
+                        <div>
                             <h2>Message</h2>
                             <p>{selectedItem?.message}</p>
                         </div>
 
                         <div>
                             <h2>Seen by</h2>
-                            <div>
+
+                            <div className="grid grid-cols-1">
                                 {selectedItem?.seenBy?.map((user, index) => (
-                                    <p key={user?._id}>
-                                        {user.email}
-                                        {index !==
-                                            selectedItem.seenBy.length - 1 &&
-                                            ", "}
-                                        <br />
-                                    </p>
+                                    <p key={index}>{user?.email}</p>
                                 ))}
                             </div>
                         </div>
 
                         <div>
                             <h2>specific users</h2>
-                            <div>
+
+                            <div className="grid grid-cols-1">
                                 {selectedItem?.specificUsers?.map(
                                     (user, index) => (
-                                        <p key={user?._id}>
-                                            {user.email}
-                                            {index !==
-                                                selectedItem.seenBy.length -
-                                                    1 && ", "}
-                                            <br />
-                                        </p>
+                                        <p key={index}>{user?.email}</p>
                                     )
                                 )}
                             </div>
@@ -862,17 +918,11 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
                         <div>
                             <h2>recipient roles</h2>
-                            <div>
+
+                            <div className="grid grid-cols-1">
                                 {selectedItem?.recipientRoles?.map(
                                     (role, index) => (
-                                        <p key={index}>
-                                            {role}
-                                            {index !==
-                                                selectedItem.recipientRoles
-                                                    .length -
-                                                    1 && ", "}
-                                            <br />
-                                        </p>
+                                        <p key={index}>{role}</p>
                                     )
                                 )}
                             </div>

@@ -117,12 +117,12 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
     const handleSave = async (e) => {
         e.preventDefault();
 
-        const name = e.target.name.value.trim();
+        const title = e.target.title.value.trim();
         const statusValue = status?.value;
 
         if (selectedItem) {
             const response = await updateItem(selectedItem?._id, {
-                name,
+                title,
                 status: statusValue,
             });
 
@@ -145,7 +145,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
             }
         } else {
             const response = await createItem({
-                name,
+                title,
                 status: statusValue,
             });
 
@@ -232,7 +232,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
         if (search) {
             const searchLower = search.toLowerCase();
             filtered = filtered.filter((item) =>
-                [item?._id?.toString(), item?.name, item?.status]
+                [item?._id?.toString(), item?.title, item?.slug, item?.status]
                     .map((field) => field?.toLowerCase() ?? "")
                     .some((field) => field?.includes(searchLower))
             );
@@ -434,7 +434,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                     filename="blog-categories.csv"
                     selectedColumns={[
                         "_id",
-                        "name",
+                        "title",
                         "slug",
                         "status",
                         "createdAt",
@@ -463,7 +463,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
                             <th>Id</th>
 
-                            <th>Name</th>
+                            <th>Title</th>
 
                             <th>Slug</th>
 
@@ -518,7 +518,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                                             className="hover:underline cursor-pointer"
                                             onClick={() => openViewModal(item)}
                                         >
-                                            {item?.name}
+                                            {item?.title}
                                         </span>
                                     </td>
 
@@ -580,18 +580,18 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                 <div>
                     <form onSubmit={handleSave}>
                         <div>
-                            <label htmlFor="name" className="">
-                                Name
+                            <label htmlFor="title" className="">
+                                Title
                             </label>
 
                             <input
                                 type="text"
-                                name="name"
-                                id="name"
+                                name="title"
+                                id="title"
                                 autoComplete="off"
                                 className=""
-                                placeholder="Enter name"
-                                defaultValue={selectedItem?.name || ""}
+                                placeholder="Enter title"
+                                defaultValue={selectedItem?.title || ""}
                                 required
                             />
                         </div>
@@ -600,6 +600,8 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                             <span className="">Status</span>
 
                             <Select
+                                name="status"
+                                id="status"
                                 options={statusOptions}
                                 onChange={setStatus}
                                 className=""
@@ -688,8 +690,8 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                         </div>
 
                         <div>
-                            <h2>Name</h2>
-                            <p>{selectedItem?.name}</p>
+                            <h2>Title</h2>
+                            <p>{selectedItem?.title}</p>
                         </div>
 
                         <div>

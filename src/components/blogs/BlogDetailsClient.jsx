@@ -80,6 +80,22 @@ const BlogDetailsClient = ({ initialBlog, slug }) => {
             </div>
 
             <div>
+                <h2>Images</h2>
+                <div className="grid grid-cols1 md:grid-cols-2 gap-4">
+                    {blog?.images?.map((image, index) => (
+                        <Image
+                            key={index}
+                            src={image}
+                            className="w-auto h-auto"
+                            width={500}
+                            height={500}
+                            alt="image"
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <div>
                 <h2>Title</h2>
                 <p>{blog?.title}</p>
             </div>

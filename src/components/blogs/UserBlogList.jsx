@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { io } from "socket.io-client";
@@ -15,6 +15,8 @@ const UserBlogList = ({
     initialBlogCategories,
     initialUsers,
 }) => {
+    const router = useRouter();
+
     const [blogs, setBlogs] = useState(initialBlogs);
     const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
     const [users, setUsers] = useState(initialUsers);
@@ -80,6 +82,10 @@ const UserBlogList = ({
         setEndDate("");
     };
 
+    const goToItemDetails = (item) => {
+        router.push(`/blogs/${item?.slug}`);
+    };
+
     // filtering logic
     useEffect(() => {
         let filtered = [...blogs];
@@ -91,6 +97,7 @@ const UserBlogList = ({
                 [
                     item?._id?.toString(),
                     item?.title,
+                    item?.slug,
                     item?.category?.name,
                     item?.status,
                     item?.createdBy?.fullName,
@@ -335,8 +342,12 @@ const UserBlogList = ({
                 {filteredItems?.length === 0 ? (
                     <div>No blogs found.</div>
                 ) : (
-                    filteredItems.map((item, index) => (
-                        <div key={item?._id}>
+                    filteredItems.map((item) => (
+                        <div
+                            onClick={() => goToItemDetails(item)}
+                            key={item?._id}
+                            className="cursor-pointer"
+                        >
                             <div>
                                 <Image
                                     src={item?.thumbnail}
@@ -348,14 +359,7 @@ const UserBlogList = ({
                                 />
                             </div>
 
-                            <h2>
-                                <Link
-                                    href={`/blogs/${item?.slug}`}
-                                    className="hover:underline"
-                                >
-                                    {item?.title}
-                                </Link>
-                            </h2>
+                            <h2>{item?.title}</h2>
 
                             <div>{item?.category?.name}</div>
 

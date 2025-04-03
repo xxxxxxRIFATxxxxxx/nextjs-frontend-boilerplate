@@ -1,34 +1,33 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import Link from "next/link";
 import { io } from "socket.io-client";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import useCrud from "@/hooks/useCrud";
 import Modal from "@/components/common/Modal";
-import TextEditor from "@/components/common/TextEditor";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
-import DefaultUserIcon from "@/components/common/DefaultUserIcon";
+import DefaultFile from "@/components/common/DefaultFile";
 import formatDateTime from "@/helpers/formatDateTime";
-import formatDate from "@/helpers/formatDate";
-import uploadSingleFile from "@/helpers/uploadSingleFile";
+import uploadMultipleFiles from "@/helpers/uploadMultipleFiles";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
+import downloadAllFiles from "@/helpers/downloadAllFiles";
 
 const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
-const UserList = ({ initialUsers }) => {
-    const [users, setUsers] = useState(initialUsers);
+const FileList = ({ initialFiles }) => {
+    const [files, setFiles] = useState(initialFiles);
 
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState("oldest");
     const [itemStatus, setItemStatus] = useState("all");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [filteredItems, setFilteredItems] = useState(users);
+    const [filteredItems, setFilteredItems] = useState(files);
     const { createItem, updateItem, deleteItem, deleteMultipleItems, loading } =
-        useCrud("users");
+        useCrud("files");
 
     const [isAddOrEditModalOpen, setIsAddOrEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -38,38 +37,30 @@ const UserList = ({ initialUsers }) => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
-    const [bio, setBio] = useState("");
-    const [userImage, setUserImage] = useState(null);
-    const userImageRef = useRef(null);
-    const [role, setRole] = useState(null);
-    const roleOptions = [
-        { label: "Super Admin", value: "super_admin" },
-        { label: "Admin", value: "admin" },
-        { label: "Moderator", value: "moderator" },
-        { label: "User", value: "user" },
-    ];
+    const [multipleFiles, setMultipleFiles] = useState([]);
+    const multipleFilesRef = useRef(null);
     const [status, setStatus] = useState(null);
     const statusOptions = [
         { label: "Active", value: "active" },
         { label: "Inactive", value: "inactive" },
-        { label: "Banned", value: "banned" },
     ];
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
-        const updatedUsersResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+        const updatedFilesResponse = await fetchDataForClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/files`
         );
 
-        const updatedUsers = updatedUsersResponse?.data || [];
+        const updatedFiles = updatedFilesResponse?.data || [];
 
-        const updatedUsersError = updatedUsersResponse?.error || null;
+        const updatedFilesError = updatedFilesResponse?.error || null;
 
-        if (updatedUsersError) {
-            const errorMessage = [updatedUsersError].filter(Boolean).join("\n");
+        if (updatedFilesError) {
+            const errorMessage = [updatedFilesError].filter(Boolean).join("\n");
+
             toast.error(errorMessage);
         } else {
-            setUsers(updatedUsers);
+            setFiles(updatedFiles);
         }
     };
 
@@ -130,54 +121,35 @@ const UserList = ({ initialUsers }) => {
         e.preventDefault();
 
         const title = e.target.title.value.trim();
-        const fullName = e.target.fullName.value.trim();
-        const email = e.target.email.value.trim();
-        const phone = e.target.phone.value.trim();
-        const username = e.target.username.value.trim();
-        const password = e.target.password.value.trim();
-        const roleValue = role?.value;
-        const dateOfBirth = e.target.dateOfBirth.value
-            ? new Date(e.target.dateOfBirth.value)
-            : null;
-        const street = e.target.street.value.trim() || null;
-        const city = e.target.city.value.trim() || null;
-        const state = e.target.state.value.trim() || null;
-        const zipCode = e.target.zipCode.value.trim() || null;
-        const country = e.target.country.value.trim() || null;
         const statusValue = status?.value;
 
-        let imageUrl = selectedItem?.image;
+        let multipleFileUrls = multipleFiles;
 
-        if (userImage) {
-            const responseFile = await uploadSingleFile(userImage);
+        if (multipleFiles.length > 0) {
+            const files = multipleFiles.filter((file) => file instanceof File);
+            const urls = multipleFiles.filter(
+                (file) => typeof file === "string"
+            );
 
-            if (responseFile?.error) {
-                return toast.error(responseFile?.error);
-            } else {
-                imageUrl = responseFile?.data?.fileUrl;
+            if (files.length > 0) {
+                const responseFiles = await uploadMultipleFiles(files);
+                if (responseFiles?.error) {
+                    return toast.error(responseFiles?.error);
+                } else {
+                    multipleFileUrls = [
+                        ...urls,
+                        ...responseFiles?.data?.fileUrls,
+                    ];
+                }
             }
         }
 
-        const userData = {
-            title,
-            fullName,
-            email,
-            phone,
-            username,
-            role: roleValue,
-            image: imageUrl,
-            dateOfBirth,
-            address: { street, city, state, zipCode, country },
-            bio,
-            status: statusValue,
-        };
-
-        if (password) {
-            userData.password = password;
-        }
-
         if (selectedItem) {
-            const response = await updateItem(selectedItem?._id, userData);
+            const response = await updateItem(selectedItem?._id, {
+                title,
+                files: multipleFileUrls,
+                status: statusValue,
+            });
 
             if (response?.data) {
                 const updatedItem = response?.data;
@@ -197,7 +169,11 @@ const UserList = ({ initialUsers }) => {
                 toast.error(response);
             }
         } else {
-            const response = await createItem(userData);
+            const response = await createItem({
+                title,
+                files: multipleFileUrls,
+                status: statusValue,
+            });
 
             if (response?.data) {
                 const newItem = response?.data;
@@ -271,48 +247,40 @@ const UserList = ({ initialUsers }) => {
     // for remove exixting items
     const removeExixtingItems = () => {
         setSelectedItem(null);
-        setRole(null);
-        setUserImage(null);
-        setBio("");
+        setMultipleFiles([]);
         setStatus(null);
     };
 
-    // for preview user image
-    const handleUserImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setUserImage(file);
+    // for preview multiple files
+    const handleMultipleFilesChange = (e) => {
+        if (!e.target.files) return;
+        const files = Array.from(e.target.files);
+        setMultipleFiles((prevFiles) => [...(prevFiles || []), ...files]);
+    };
+
+    // for drag and drop multiple files
+    const handleMultipleFilesDrop = (e) => {
+        e.preventDefault();
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0) {
+            setMultipleFiles((prevFiles) => [...(prevFiles || []), ...files]);
         }
     };
 
-    // for drag and drop user image
-    const handleUserImageDrop = (e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        if (file) {
-            setUserImage(file);
-        }
+    // remove an file from preview
+    const removeFileFromPreview = (index) => {
+        setMultipleFiles(multipleFiles.filter((_, i) => i !== index));
     };
 
     // filtering logic
     useEffect(() => {
-        let filtered = [...users];
+        let filtered = [...files];
 
         // search
         if (search) {
             const searchLower = search.toLowerCase();
             filtered = filtered.filter((item) =>
-                [
-                    item?._id?.toString(),
-                    item?.title,
-                    item?.slug,
-                    item?.fullName,
-                    item?.email,
-                    item?.phone,
-                    item?.username,
-                    item?.role,
-                    item?.status,
-                ]
+                [item?._id?.toString(), item?.title, item?.slug, item?.status]
                     .map((field) => field?.toLowerCase() ?? "")
                     .some((field) => field?.includes(searchLower))
             );
@@ -346,39 +314,32 @@ const UserList = ({ initialUsers }) => {
         }
 
         setFilteredItems(filtered);
-    }, [search, sortBy, itemStatus, startDate, endDate, users]);
+    }, [search, sortBy, itemStatus, startDate, endDate, files]);
 
     // update state when selectedItem changes
     useEffect(() => {
-        setRole(
-            roleOptions.find(
-                (option) => option?.value === selectedItem?.role
-            ) || null
-        );
+        setMultipleFiles(selectedItem?.files);
 
         setStatus(
             statusOptions.find(
                 (option) => option?.value === selectedItem?.status
             ) || null
         );
-
-        setBio(selectedItem?.bio || "");
     }, [selectedItem]);
 
     // listen for real-time events and update ui
     useEffect(() => {
-        socket.on("usersUpdated", refreshData);
-
+        socket.on("filesUpdated", refreshData);
         return () => {
-            socket.off("usersUpdated", refreshData);
+            socket.off("filesUpdated", refreshData);
         };
     }, []);
 
     return (
         <div>
             <div>
-                <h1>User List</h1>
-                <h2>Total Users: {filteredItems?.length}</h2>
+                <h1>File List</h1>
+                <h2>Total Files: {filteredItems?.length}</h2>
             </div>
 
             <div>
@@ -394,7 +355,7 @@ const UserList = ({ initialUsers }) => {
                         id="search"
                         autoComplete="on"
                         className=""
-                        placeholder="Search users..."
+                        placeholder="Search files..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -437,7 +398,6 @@ const UserList = ({ initialUsers }) => {
                             { label: "All", value: "all" },
                             { label: "Active", value: "active" },
                             { label: "Inactive", value: "inactive" },
-                            { label: "Banned", value: "banned" },
                         ]}
                         onChange={(selectedOption) =>
                             setItemStatus(selectedOption?.value)
@@ -452,9 +412,7 @@ const UserList = ({ initialUsers }) => {
                                               ? "All"
                                               : itemStatus === "active"
                                               ? "Active"
-                                              : itemStatus === "inactive"
-                                              ? "Inactive"
-                                              : "Banned",
+                                              : "Inactive",
                                       value: itemStatus,
                                   }
                                 : null
@@ -522,30 +480,20 @@ const UserList = ({ initialUsers }) => {
                 {/* download csv button */}
                 <DownloadCSVButton
                     data={filteredItems}
-                    filename="users.csv"
+                    filename="files.csv"
                     selectedColumns={[
                         "_id",
                         "title",
                         "slug",
-                        "fullName",
-                        "email",
-                        "phone",
-                        "username",
-                        "password",
-                        "role",
+                        "files",
                         "status",
-                        "image",
-                        "dateOfBirth",
-                        "address_street",
-                        "address_city",
-                        "address_state",
-                        "address_zipCode",
-                        "address_country",
-                        "lastLogin",
                         "createdAt",
                         "updatedAt",
                     ]}
                 />
+
+                {/* download all files */}
+                <button onClick={downloadAllFiles}>Download all files</button>
             </div>
 
             {/* table */}
@@ -566,27 +514,13 @@ const UserList = ({ initialUsers }) => {
 
                             <th>#</th>
 
-                            <th>Image</th>
-
                             <th>Id</th>
 
                             <th>Title</th>
 
                             <th>Slug</th>
 
-                            <th>Full name</th>
-
-                            <th>Email</th>
-
-                            <th>Phone</th>
-
-                            <th>Username</th>
-
-                            <th>Role</th>
-
-                            <th>Date of birth</th>
-
-                            <th>Last login</th>
+                            <th>Files</th>
 
                             <th>Status</th>
 
@@ -601,8 +535,8 @@ const UserList = ({ initialUsers }) => {
                     <tbody>
                         {filteredItems?.length === 0 ? (
                             <tr>
-                                <td colSpan="17" className="text-center">
-                                    No users found.
+                                <td colSpan="9" className="text-center">
+                                    No files found.
                                 </td>
                             </tr>
                         ) : (
@@ -626,25 +560,6 @@ const UserList = ({ initialUsers }) => {
                                     <td>{index + 1}</td>
 
                                     <td>
-                                        {item?.image ? (
-                                            <Image
-                                                src={item?.image}
-                                                className="w-[200px] h-[200px] object-cover rounded-full"
-                                                width={200}
-                                                height={200}
-                                                alt="user image"
-                                                priority
-                                            />
-                                        ) : (
-                                            <DefaultUserIcon
-                                                width="w-[200px]"
-                                                height="h-[200px]"
-                                                iconSize={100}
-                                            />
-                                        )}
-                                    </td>
-
-                                    <td>
                                         <span
                                             className="hover:underline cursor-pointer"
                                             onClick={() => openViewModal(item)}
@@ -664,43 +579,17 @@ const UserList = ({ initialUsers }) => {
 
                                     <td>{item?.slug}</td>
 
-                                    <td>
-                                        <span
-                                            className="hover:underline cursor-pointer"
-                                            onClick={() => openViewModal(item)}
-                                        >
-                                            {item?.fullName}
-                                        </span>
-                                    </td>
-
-                                    <td>{item?.email}</td>
-
-                                    <td>{item?.phone}</td>
-
-                                    <td>{item?.username}</td>
-
-                                    <td>{item?.role}</td>
-
-                                    <td>
-                                        {item?.dateOfBirth ? (
-                                            <span>
-                                                {formatDate(item?.dateOfBirth)}
-                                            </span>
-                                        ) : (
-                                            <span>-</span>
-                                        )}
-                                    </td>
-
-                                    <td>
-                                        {item?.lastLogin ? (
-                                            <span>
-                                                {formatDateTime(
-                                                    item?.lastLogin
-                                                )}
-                                            </span>
-                                        ) : (
-                                            <span>-</span>
-                                        )}
+                                    <td className="grid grid-cols-1">
+                                        {item?.files?.map((file, index) => (
+                                            <Link
+                                                key={index}
+                                                href={file}
+                                                className="hover:underline"
+                                                target="_blank"
+                                            >
+                                                {file}
+                                            </Link>
+                                        ))}
                                     </td>
 
                                     <td>{item?.status}</td>
@@ -747,7 +636,7 @@ const UserList = ({ initialUsers }) => {
 
             {/* add or edit modal */}
             <Modal
-                title={selectedItem ? "Edit User" : "Add New User"}
+                title={selectedItem ? "Edit Files" : "Upload New Files"}
                 isOpen={isAddOrEditModalOpen}
                 onClose={closeAddOrEditModal}
                 width="max-w-4xl"
@@ -772,265 +661,67 @@ const UserList = ({ initialUsers }) => {
                         </div>
 
                         <div>
-                            <label htmlFor="fullName" className="">
-                                Full Name
+                            <label htmlFor="files" className="">
+                                Files
                             </label>
 
-                            <input
-                                type="text"
-                                name="fullName"
-                                id="fullName"
-                                autoComplete="off"
-                                className=""
-                                placeholder="Enter full name"
-                                defaultValue={selectedItem?.fullName || ""}
-                                required
-                            />
-                        </div>
+                            {multipleFiles?.length > 0 && (
+                                <div className="grid grid-cols-1 gap-2">
+                                    {multipleFiles?.map((file, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between"
+                                        >
+                                            <Link
+                                                href={
+                                                    file instanceof File
+                                                        ? URL.createObjectURL(
+                                                              file
+                                                          )
+                                                        : file
+                                                }
+                                                className="hover:underline"
+                                                target="_blank"
+                                            >
+                                                {file instanceof File
+                                                    ? file?.name
+                                                    : file}
+                                            </Link>
 
-                        <div>
-                            <label htmlFor="email" className="">
-                                Email
-                            </label>
-
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                autoComplete="email"
-                                className=""
-                                placeholder="Enter email"
-                                defaultValue={selectedItem?.email || ""}
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="phone" className="">
-                                Phone
-                            </label>
-
-                            <input
-                                type="tel"
-                                name="phone"
-                                id="phone"
-                                autoComplete="tel"
-                                className=""
-                                placeholder="Enter phone number"
-                                defaultValue={selectedItem?.phone || ""}
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="username" className="">
-                                Username
-                            </label>
-
-                            <input
-                                type="text"
-                                name="username"
-                                id="username"
-                                autoComplete="username"
-                                className=""
-                                placeholder="Enter username"
-                                defaultValue={selectedItem?.username || ""}
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="">
-                                Password
-                            </label>
-
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                autoComplete="new-password"
-                                className=""
-                                placeholder="••••••••"
-                            />
-                        </div>
-
-                        <div>
-                            <span className="">Role</span>
-
-                            <Select
-                                name="role"
-                                id="role"
-                                options={roleOptions}
-                                onChange={setRole}
-                                className=""
-                                placeholder="Select role"
-                                defaultValue={
-                                    roleOptions.find(
-                                        (role) =>
-                                            role?.value === selectedItem?.role
-                                    ) || null
-                                }
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="image" className="">
-                                Image
-                            </label>
-
-                            {userImage || selectedItem?.image ? (
-                                <Image
-                                    src={
-                                        userImage
-                                            ? URL.createObjectURL(userImage)
-                                            : selectedItem?.image
-                                    }
-                                    className="w-[200px] h-[200px] object-cover rounded-full cursor-pointer"
-                                    width={200}
-                                    height={200}
-                                    alt="user image"
-                                    onClick={() => userImageRef.current.click()}
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={handleUserImageDrop}
-                                />
-                            ) : (
-                                <DefaultUserIcon
-                                    width="w-[200px]"
-                                    height="h-[200px]"
-                                    iconSize={100}
-                                    onClick={() => userImageRef.current.click()}
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={handleUserImageDrop}
-                                />
+                                            <button
+                                                className="bg-red-500 text-white p-1 rounded-full cursor-pointer "
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    removeFileFromPreview(
+                                                        index
+                                                    );
+                                                }}
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
+
+                            <DefaultFile
+                                width="w-full"
+                                height="h-[400px]"
+                                iconSize={100}
+                                onClick={() => multipleFilesRef.current.click()}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={handleMultipleFilesDrop}
+                            />
 
                             <input
                                 type="file"
-                                name="image"
-                                id="image"
+                                name="files"
+                                id="files"
                                 className=""
-                                accept="image/*"
-                                onChange={handleUserImageChange}
-                                ref={userImageRef}
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="dateOfBirth" className="">
-                                Date of Birth
-                            </label>
-
-                            <input
-                                type="date"
-                                name="dateOfBirth"
-                                id="dateOfBirth"
-                                autoComplete="bday"
-                                className=""
-                                defaultValue={
-                                    selectedItem?.dateOfBirth
-                                        ? new Date(selectedItem?.dateOfBirth)
-                                              .toISOString()
-                                              .split("T")[0]
-                                        : ""
-                                }
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="street" className="">
-                                Street
-                            </label>
-
-                            <input
-                                type="text"
-                                name="street"
-                                id="street"
-                                autoComplete="street-address"
-                                className=""
-                                placeholder="Enter street"
-                                defaultValue={
-                                    selectedItem?.address?.street || ""
-                                }
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="city" className="">
-                                City
-                            </label>
-
-                            <input
-                                type="text"
-                                name="city"
-                                id="city"
-                                autoComplete="address-level2"
-                                className=""
-                                placeholder="Enter city"
-                                defaultValue={selectedItem?.address?.city || ""}
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="state" className="">
-                                State
-                            </label>
-
-                            <input
-                                type="text"
-                                name="state"
-                                id="state"
-                                autoComplete="address-level1"
-                                className=""
-                                placeholder="Enter state"
-                                defaultValue={
-                                    selectedItem?.address?.state || ""
-                                }
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="zipCode" className="">
-                                Zip Code
-                            </label>
-
-                            <input
-                                type="text"
-                                name="zipCode"
-                                id="zipCode"
-                                autoComplete="postal-code"
-                                className=""
-                                placeholder="Enter zip code"
-                                defaultValue={
-                                    selectedItem?.address?.zipCode || ""
-                                }
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="country" className="">
-                                Country
-                            </label>
-
-                            <input
-                                type="text"
-                                name="country"
-                                id="country"
-                                autoComplete="country"
-                                className=""
-                                placeholder="Enter country"
-                                defaultValue={
-                                    selectedItem?.address?.country || ""
-                                }
-                            />
-                        </div>
-
-                        <div>
-                            <span className="">Bio</span>
-
-                            <TextEditor
-                                onChange={setBio}
-                                content={selectedItem?.bio}
+                                onChange={handleMultipleFilesChange}
+                                ref={multipleFilesRef}
+                                multiple
                             />
                         </div>
 
@@ -1038,8 +729,6 @@ const UserList = ({ initialUsers }) => {
                             <span className="">Status</span>
 
                             <Select
-                                name="status"
-                                id="status"
                                 options={statusOptions}
                                 onChange={setStatus}
                                 className=""
@@ -1080,7 +769,7 @@ const UserList = ({ initialUsers }) => {
                 <div>
                     <p>
                         Are you sure you want to delete <br />
-                        {selectedItem?.fullName} ?
+                        {selectedItem?.title} ?
                     </p>
 
                     <button type="button" onClick={closeDeleteModal}>
@@ -1115,34 +804,13 @@ const UserList = ({ initialUsers }) => {
 
             {/* view modal */}
             <Modal
-                title="User Details"
+                title="File Details"
                 isOpen={isViewModalOpen}
                 onClose={closeViewModal}
                 width="max-w-4xl"
             >
                 {selectedItem && (
                     <div>
-                        <div>
-                            <h2>Image</h2>
-
-                            {selectedItem?.image ? (
-                                <Image
-                                    src={selectedItem?.image}
-                                    className="w-[200px] h-[200px] object-cover rounded-full"
-                                    width={200}
-                                    height={200}
-                                    alt="user image"
-                                    priority
-                                />
-                            ) : (
-                                <DefaultUserIcon
-                                    width="w-[200px]"
-                                    height="h-[200px]"
-                                    iconSize={100}
-                                />
-                            )}
-                        </div>
-
                         <div>
                             <h2>Id</h2>
                             <p>{selectedItem?._id}</p>
@@ -1159,58 +827,19 @@ const UserList = ({ initialUsers }) => {
                         </div>
 
                         <div>
-                            <h2>Full name</h2>
-                            <p>{selectedItem?.fullName}</p>
-                        </div>
-
-                        <div>
-                            <h2>Email</h2>
-                            <p>{selectedItem?.email}</p>
-                        </div>
-
-                        <div>
-                            <h2>Phone</h2>
-                            <p>{selectedItem?.phone}</p>
-                        </div>
-
-                        <div>
-                            <h2>Username</h2>
-                            <p>{selectedItem?.username}</p>
-                        </div>
-
-                        <div>
-                            <h2>Role</h2>
-                            <p>{selectedItem?.role}</p>
-                        </div>
-
-                        <div>
-                            <h2>Date of birth</h2>
-                            {selectedItem?.dateOfBirth && (
-                                <p>{formatDate(selectedItem?.dateOfBirth)}</p>
-                            )}
-                        </div>
-
-                        <div>
-                            <h2>Address</h2>
-                            <p>Street: {selectedItem?.address?.street}</p>
-                            <p>City: {selectedItem?.address?.city}</p>
-                            <p>State: {selectedItem?.address?.state}</p>
-                            <p>Zip code: {selectedItem?.address?.zipCode}</p>
-                            <p>Country: {selectedItem?.address?.country}</p>
-                        </div>
-
-                        <div>
-                            <h2>Bio</h2>
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: selectedItem?.bio,
-                                }}
-                            ></div>
-                        </div>
-
-                        <div>
-                            <h2>Last login</h2>
-                            <p>{formatDateTime(selectedItem?.lastLogin)}</p>
+                            <h2>File Urls</h2>
+                            <div className="grid grid-cols-1">
+                                {selectedItem?.files?.map((file, index) => (
+                                    <Link
+                                        key={index}
+                                        href={file}
+                                        className="hover:underline"
+                                        target="_blank"
+                                    >
+                                        {file}
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
 
                         <div>
@@ -1234,4 +863,4 @@ const UserList = ({ initialUsers }) => {
     );
 };
 
-export default UserList;
+export default FileList;

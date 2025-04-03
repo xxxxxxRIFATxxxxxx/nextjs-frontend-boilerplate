@@ -24,6 +24,7 @@ const ProfileContent = () => {
 
         setLoading(true);
 
+        const title = e.target.title.value.trim();
         const fullName = e.target.fullName.value.trim();
         const email = e.target.email.value.trim();
         const phone = e.target.phone.value.trim();
@@ -61,6 +62,7 @@ const ProfileContent = () => {
         }
 
         const profileData = {
+            title,
             fullName,
             email,
             phone,
@@ -125,6 +127,16 @@ const ProfileContent = () => {
         <section>
             {/* user information */}
             <div>
+                <div>
+                    <h2>Title</h2>
+                    <p>{user?.title}</p>
+                </div>
+
+                <div>
+                    <h2>Slug</h2>
+                    <p>{user?.slug}</p>
+                </div>
+
                 <div>
                     <h2>Full name</h2>
                     <p>{user?.fullName}</p>
@@ -209,7 +221,26 @@ const ProfileContent = () => {
                 <div>
                     <form onSubmit={handleSave}>
                         <div>
-                            <label htmlFor="fullName">Full Name</label>
+                            <label htmlFor="title" className="">
+                                Title
+                            </label>
+
+                            <input
+                                type="text"
+                                name="title"
+                                id="title"
+                                autoComplete="off"
+                                className=""
+                                placeholder="Enter title"
+                                defaultValue={user?.title || ""}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="fullName" className="">
+                                Full Name
+                            </label>
 
                             <input
                                 type="text"
@@ -224,7 +255,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="email">Email</label>
+                            <label htmlFor="email" className="">
+                                Email
+                            </label>
 
                             <input
                                 type="email"
@@ -239,7 +272,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="phone">Phone</label>
+                            <label htmlFor="phone" className="">
+                                Phone
+                            </label>
 
                             <input
                                 type="tel"
@@ -254,7 +289,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="username">Username</label>
+                            <label htmlFor="username" className="">
+                                Username
+                            </label>
 
                             <input
                                 type="text"
@@ -269,7 +306,7 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="currentPassword">
+                            <label htmlFor="currentPassword" className="">
                                 Current Password
                             </label>
 
@@ -284,7 +321,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="newPassword">New Password</label>
+                            <label htmlFor="newPassword" className="">
+                                New Password
+                            </label>
 
                             <input
                                 type="password"
@@ -297,7 +336,7 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="confirmNewPassword">
+                            <label htmlFor="confirmNewPassword" className="">
                                 Confirm New Password
                             </label>
 
@@ -312,7 +351,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="image">Image</label>
+                            <label htmlFor="image" className="">
+                                Image
+                            </label>
 
                             {userImage || user?.image ? (
                                 <Image
@@ -358,7 +399,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="dateOfBirth">Date of Birth</label>
+                            <label htmlFor="dateOfBirth" className="">
+                                Date of Birth
+                            </label>
 
                             <input
                                 type="date"
@@ -377,7 +420,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="street">Street</label>
+                            <label htmlFor="street" className="">
+                                Street
+                            </label>
 
                             <input
                                 type="text"
@@ -391,7 +436,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="city">City</label>
+                            <label htmlFor="city" className="">
+                                City
+                            </label>
 
                             <input
                                 type="text"
@@ -405,7 +452,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="state">State</label>
+                            <label htmlFor="state" className="">
+                                State
+                            </label>
 
                             <input
                                 type="text"
@@ -419,7 +468,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="zipCode">Zip Code</label>
+                            <label htmlFor="zipCode" className="">
+                                Zip Code
+                            </label>
 
                             <input
                                 type="text"
@@ -433,7 +484,9 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="country">Country</label>
+                            <label htmlFor="country" className="">
+                                Country
+                            </label>
 
                             <input
                                 type="text"
