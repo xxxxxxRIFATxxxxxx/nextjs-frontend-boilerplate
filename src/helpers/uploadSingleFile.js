@@ -24,7 +24,7 @@ const uploadSingleFile = async (selectedFile) => {
 
         return data;
     } catch (error) {
-        return { error: error.message || "Failed to upload file." };
+        return { error: error?.message || "Failed to upload file." };
     }
 };
 

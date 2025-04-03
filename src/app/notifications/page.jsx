@@ -4,7 +4,12 @@ import Error from "@/components/common/Error";
 import NotificationList from "@/components/notifications/NotificationList";
 import fetchData from "@/helpers/fetchData";
 
-const Notification = async () => {
+export const metadata = {
+    title: "Next JS Frontend Boilerplate - Notifications",
+    description: "Next JS Frontend Boilerplate",
+};
+
+const Notifications = async () => {
     const notificationsResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/notifications`
     );
@@ -47,4 +52,4 @@ const Notification = async () => {
     );
 };
 
-export default Notification;
+export default Notifications;

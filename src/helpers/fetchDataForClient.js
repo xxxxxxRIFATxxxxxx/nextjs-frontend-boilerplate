@@ -27,7 +27,7 @@ const fetchDataForClient = async (apiURL) => {
 
         return data;
     } catch (error) {
-        return { error: error.message || "Failed to fetch data" };
+        return { error: error?.message || "Failed to fetch data" };
     }
 };
 

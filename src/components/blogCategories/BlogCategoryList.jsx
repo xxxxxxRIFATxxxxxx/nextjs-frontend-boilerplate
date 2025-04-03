@@ -121,7 +121,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
         const statusValue = status?.value;
 
         if (selectedItem) {
-            const response = await updateItem(selectedItem._id, {
+            const response = await updateItem(selectedItem?._id, {
                 name,
                 status: statusValue,
             });
@@ -131,7 +131,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
                 setFilteredItems((prev) =>
                     prev.map((item) =>
-                        item._id === selectedItem._id
+                        item?._id === selectedItem?._id
                             ? {
                                   ...updatedItem,
                               }
@@ -169,11 +169,11 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
     // handle item deletion
     const handleDelete = async () => {
-        const response = await deleteItem(selectedItem._id);
+        const response = await deleteItem(selectedItem?._id);
 
         if (response?.message) {
             setFilteredItems((prev) =>
-                prev.filter((item) => item._id !== selectedItem._id)
+                prev.filter((item) => item?._id !== selectedItem?._id)
             );
             toast.success(response?.message);
             setIsDeleteModalOpen(false);
@@ -186,7 +186,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
     const handleSelectAll = () => {
         setSelectAll(!selectAll);
         setSelectedItems(
-            selectAll ? [] : filteredItems.map((item) => item._id)
+            selectAll ? [] : filteredItems.map((item) => item?._id)
         );
     };
 
@@ -207,7 +207,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
         if (response?.message) {
             setFilteredItems((prev) =>
-                prev.filter((item) => !selectedItems.includes(item._id))
+                prev.filter((item) => !selectedItems.includes(item?._id))
             );
             toast.success(response?.message);
             setSelectedItems([]);
@@ -241,17 +241,17 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
         // sort by newest or oldest
         if (sortBy === "newest") {
             filtered.sort(
-                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                (a, b) => new Date(b?.createdAt) - new Date(a?.createdAt)
             );
         } else if (sortBy === "oldest") {
             filtered.sort(
-                (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+                (a, b) => new Date(a?.createdAt) - new Date(b?.createdAt)
             );
         }
 
         // filter by status
         if (itemStatus !== "all") {
-            filtered = filtered.filter((item) => item.status === itemStatus);
+            filtered = filtered.filter((item) => item?.status === itemStatus);
         }
 
         // search by date time range
@@ -272,7 +272,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
     useEffect(() => {
         setStatus(
             statusOptions.find(
-                (option) => option.value === selectedItem?.status
+                (option) => option?.value === selectedItem?.status
             ) || null
         );
     }, [selectedItem]);
@@ -290,7 +290,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
         <div>
             <div>
                 <h1>Blog Category List</h1>
-                <h2>Total Blog Categories: {filteredItems.length}</h2>
+                <h2>Total Blog Categories: {filteredItems?.length}</h2>
             </div>
 
             <div>
@@ -322,7 +322,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                             { label: "Oldest", value: "oldest" },
                         ]}
                         onChange={(selectedOption) =>
-                            setSortBy(selectedOption.value)
+                            setSortBy(selectedOption?.value)
                         }
                         className=""
                         placeholder="Select sorting order"
@@ -351,7 +351,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                             { label: "Inactive", value: "inactive" },
                         ]}
                         onChange={(selectedOption) =>
-                            setItemStatus(selectedOption.value)
+                            setItemStatus(selectedOption?.value)
                         }
                         className=""
                         placeholder="Select status"
@@ -478,7 +478,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                     </thead>
 
                     <tbody>
-                        {filteredItems.length === 0 ? (
+                        {filteredItems?.length === 0 ? (
                             <tr>
                                 <td colSpan="9" className="text-center">
                                     No blog categories found.
@@ -607,7 +607,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                                 defaultValue={
                                     statusOptions.find(
                                         (status) =>
-                                            status.value ===
+                                            status?.value ===
                                             selectedItem?.status
                                     ) || null
                                 }

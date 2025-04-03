@@ -24,7 +24,7 @@ const uploadMultipleFiles = async (selectedFiles) => {
 
         return data;
     } catch (error) {
-        return { error: error.message || "Failed to upload files." };
+        return { error: error?.message || "Failed to upload files." };
     }
 };
 

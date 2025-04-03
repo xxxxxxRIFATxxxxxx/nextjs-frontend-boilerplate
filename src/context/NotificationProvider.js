@@ -38,9 +38,9 @@ export const NotificationProvider = ({ children }) => {
                 { headers: getAuthHeaders() }
             );
 
-            setNotifications(response.data.data);
+            setNotifications(response?.data?.data);
 
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||
@@ -66,8 +66,8 @@ export const NotificationProvider = ({ children }) => {
             // update state to mark the specific notification as seen
             setNotifications((prev) =>
                 prev.map((n) =>
-                    n._id === notificationId
-                        ? { ...n, seenBy: [...n.seenBy, { _id: user._id }] } // add user id to seenBy
+                    n?._id === notificationId
+                        ? { ...n, seenBy: [...n?.seenBy, { _id: user?._id }] } // add user id to seenBy
                         : n
                 )
             );
@@ -87,9 +87,10 @@ export const NotificationProvider = ({ children }) => {
         try {
             const unseenNotificationIds = notifications
                 .filter(
-                    (n) => !n.seenBy.some((userObj) => userObj._id === user._id)
+                    (n) =>
+                        !n?.seenBy.some((userObj) => userObj?._id === user?._id)
                 ) // check populated user objects
-                .map((n) => n._id); // extract their ids
+                .map((n) => n?._id); // extract their ids
 
             if (unseenNotificationIds.length === 0) return; // no unseen notifications
 
@@ -102,8 +103,8 @@ export const NotificationProvider = ({ children }) => {
             // update state to mark notifications as seen
             setNotifications((prev) =>
                 prev.map((n) =>
-                    unseenNotificationIds.includes(n._id)
-                        ? { ...n, seenBy: [...n.seenBy, { _id: user._id }] } // add populated user
+                    unseenNotificationIds.includes(n?._id)
+                        ? { ...n, seenBy: [...n?.seenBy, { _id: user?._id }] } // add populated user
                         : n
                 )
             );

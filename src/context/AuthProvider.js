@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
     // listen for real-time events and update ui
     useEffect(() => {
         socket.on("usersUpdated", async (change) => {
-            if (user && change.documentKey._id === user?._id) {
+            if (user && change.documentKey?._id === user?._id) {
                 // fetch latest user data if the logged-in user was updated
                 await fetchUser(user?._id);
             }
@@ -81,8 +81,8 @@ export const AuthProvider = ({ children }) => {
                 { headers: getAuthHeaders() }
             );
 
-            setUser(response.data.data);
-            return response.data;
+            setUser(response?.data?.data);
+            return response?.data;
         } catch (error) {
             logout();
 
@@ -104,14 +104,14 @@ export const AuthProvider = ({ children }) => {
                 { emailOrPhoneOrUsername, password }
             );
 
-            setAuthCookies(response.data.token, response.data.data._id);
-            setUser(response.data.data);
+            setAuthCookies(response?.data?.token, response?.data?.data?._id);
+            setUser(response?.data?.data);
 
-            const decoded = decodeToken(response.data.token);
+            const decoded = decodeToken(response?.data?.token);
             if (decoded) scheduleAutoLogout(decoded.exp);
             router.push("/");
 
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||
@@ -129,14 +129,14 @@ export const AuthProvider = ({ children }) => {
                 userInfo
             );
 
-            setAuthCookies(response.data.token, response.data.data._id);
-            setUser(response.data.data);
+            setAuthCookies(response?.data?.token, response?.data?.data?._id);
+            setUser(response?.data?.data);
 
-            const decoded = decodeToken(response.data.token);
+            const decoded = decodeToken(response?.data?.token);
             if (decoded) scheduleAutoLogout(decoded.exp);
             router.push("/");
 
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||
@@ -155,9 +155,9 @@ export const AuthProvider = ({ children }) => {
                 { headers: getAuthHeaders() }
             );
 
-            setUser(response.data.data);
+            setUser(response?.data?.data);
 
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||
@@ -175,7 +175,7 @@ export const AuthProvider = ({ children }) => {
                 { email }
             );
 
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||
@@ -193,7 +193,7 @@ export const AuthProvider = ({ children }) => {
                 { token, newPassword }
             );
 
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||

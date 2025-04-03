@@ -170,9 +170,9 @@ const AdminBlogList = ({
             const responseFile = await uploadSingleFile(thumbnailImage);
 
             if (responseFile?.error) {
-                return toast.error(responseFile.error);
+                return toast.error(responseFile?.error);
             } else {
-                thumbnailUrl = responseFile.data.fileUrl;
+                thumbnailUrl = responseFile?.data?.fileUrl;
             }
         }
 
@@ -182,9 +182,9 @@ const AdminBlogList = ({
             const responseFile = await uploadSingleFile(coverImage);
 
             if (responseFile?.error) {
-                return toast.error(responseFile.error);
+                return toast.error(responseFile?.error);
             } else {
-                coverImageUrl = responseFile.data.fileUrl;
+                coverImageUrl = responseFile?.data?.fileUrl;
             }
         }
 
@@ -197,15 +197,15 @@ const AdminBlogList = ({
             if (files.length > 0) {
                 const responseFiles = await uploadMultipleFiles(files);
                 if (responseFiles?.error) {
-                    return toast.error(responseFiles.error);
+                    return toast.error(responseFiles?.error);
                 } else {
-                    imageUrls = [...urls, ...responseFiles.data.fileUrls];
+                    imageUrls = [...urls, ...responseFiles?.data?.fileUrls];
                 }
             }
         }
 
         if (selectedItem) {
-            const response = await updateItem(selectedItem._id, {
+            const response = await updateItem(selectedItem?._id, {
                 title,
                 description,
                 category: categoryId,
@@ -221,21 +221,20 @@ const AdminBlogList = ({
 
                 setFilteredItems((prev) =>
                     prev.map((item) =>
-                        item._id === selectedItem._id
+                        item?._id === selectedItem?._id
                             ? {
                                   ...updatedItem,
                                   category: blogCategories.find(
-                                      (blogCat) => blogCat._id === category
+                                      (blogCat) => blogCat?._id === category
                                   ),
                                   createdBy: users.find(
-                                      (user) => user._id === createdBy
+                                      (user) => user?._id === createdBy
                                   ),
                               }
                             : item
                     )
                 );
                 toast.success(response?.message);
-                setDescription("");
                 closeAddOrEditModal();
             } else {
                 toast.error(response);
@@ -260,14 +259,15 @@ const AdminBlogList = ({
                     {
                         ...newItem,
                         category: blogCategories.find(
-                            (blogCat) => blogCat._id === category
+                            (blogCat) => blogCat?._id === category
                         ),
-                        createdBy: users.find((user) => user._id === createdBy),
+                        createdBy: users.find(
+                            (user) => user?._id === createdBy
+                        ),
                     },
                 ]);
 
                 toast.success(response?.message);
-                setDescription("");
                 closeAddOrEditModal();
             } else {
                 toast.error(response);
@@ -277,11 +277,11 @@ const AdminBlogList = ({
 
     // handle item deletion
     const handleDelete = async () => {
-        const response = await deleteItem(selectedItem._id);
+        const response = await deleteItem(selectedItem?._id);
 
         if (response?.message) {
             setFilteredItems((prev) =>
-                prev.filter((item) => item._id !== selectedItem._id)
+                prev.filter((item) => item?._id !== selectedItem?._id)
             );
             toast.success(response?.message);
             setIsDeleteModalOpen(false);
@@ -294,7 +294,7 @@ const AdminBlogList = ({
     const handleSelectAll = () => {
         setSelectAll(!selectAll);
         setSelectedItems(
-            selectAll ? [] : filteredItems.map((item) => item._id)
+            selectAll ? [] : filteredItems.map((item) => item?._id)
         );
     };
 
@@ -315,7 +315,7 @@ const AdminBlogList = ({
 
         if (response?.message) {
             setFilteredItems((prev) =>
-                prev.filter((item) => !selectedItems.includes(item._id))
+                prev.filter((item) => !selectedItems.includes(item?._id))
             );
             toast.success(response?.message);
             setSelectedItems([]);
@@ -328,6 +328,7 @@ const AdminBlogList = ({
 
     // for remove exixting items
     const removeExixtingItems = () => {
+        setDescription("");
         setSelectedItem(null);
         setCategory(null);
         setThumbnailImage(null);
@@ -382,7 +383,9 @@ const AdminBlogList = ({
     const handleImagesDrop = (e) => {
         e.preventDefault();
         const files = Array.from(e.dataTransfer.files);
-        if (files.length > 0) setImages([...images, ...files]);
+        if (files.length > 0) {
+            setImages((prevImages) => [...(prevImages || []), ...files]);
+        }
     };
 
     // remove an image from preview
@@ -417,17 +420,17 @@ const AdminBlogList = ({
         // sort by newest or oldest
         if (sortBy === "newest") {
             filtered.sort(
-                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                (a, b) => new Date(b?.createdAt) - new Date(a?.createdAt)
             );
         } else if (sortBy === "oldest") {
             filtered.sort(
-                (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+                (a, b) => new Date(a?.createdAt) - new Date(b?.createdAt)
             );
         }
 
         // filter by status
         if (itemStatus !== "all") {
-            filtered = filtered.filter((item) => item.status === itemStatus);
+            filtered = filtered.filter((item) => item?.status === itemStatus);
         }
 
         // search by date time range
@@ -473,7 +476,7 @@ const AdminBlogList = ({
 
         setStatus(
             statusOptions.find(
-                (option) => option.value === selectedItem?.status
+                (option) => option?.value === selectedItem?.status
             ) || null
         );
     }, [selectedItem]);
@@ -495,7 +498,7 @@ const AdminBlogList = ({
         <div>
             <div>
                 <h1>Blog List</h1>
-                <h2>Total Blogs: {filteredItems.length}</h2>
+                <h2>Total Blogs: {filteredItems?.length}</h2>
             </div>
 
             <div>
@@ -527,7 +530,7 @@ const AdminBlogList = ({
                             { label: "Oldest", value: "oldest" },
                         ]}
                         onChange={(selectedOption) =>
-                            setSortBy(selectedOption.value)
+                            setSortBy(selectedOption?.value)
                         }
                         className=""
                         placeholder="Select sorting order"
@@ -556,7 +559,7 @@ const AdminBlogList = ({
                             { label: "Inactive", value: "inactive" },
                         ]}
                         onChange={(selectedOption) =>
-                            setItemStatus(selectedOption.value)
+                            setItemStatus(selectedOption?.value)
                         }
                         className=""
                         placeholder="Select status"
@@ -693,7 +696,7 @@ const AdminBlogList = ({
                     </thead>
 
                     <tbody>
-                        {filteredItems.length === 0 ? (
+                        {filteredItems?.length === 0 ? (
                             <tr>
                                 <td colSpan="12" className="text-center">
                                     No blogs found.
@@ -953,27 +956,6 @@ const AdminBlogList = ({
                                 Images
                             </label>
 
-                            {/* show existing images if they exist and no new images are uploaded yet */}
-                            {/* {selectedItem?.images?.length > 0 &&
-                                images?.length === 0 && (
-                                    <div className="grid grid-cols-3 gap-4">
-                                        {selectedItem?.images?.map(
-                                            (image, index) => (
-                                                <div key={index}>
-                                                    <Image
-                                                        src={image}
-                                                        className="w-auto h-auto object-cover cursor-pointer"
-                                                        width={500}
-                                                        height={500}
-                                                        alt="image"
-                                                    />
-                                                </div>
-                                            )
-                                        )}
-                                    </div>
-                                )} */}
-
-                            {/* show newly uploaded images these will replace existing ones upon submission */}
                             {images?.length > 0 && (
                                 <div className="grid grid-cols-3 gap-4">
                                     {images?.map((image, index) => (
@@ -1018,7 +1000,6 @@ const AdminBlogList = ({
                                 onDrop={handleImagesDrop}
                             />
 
-                            {/* file input for new image uploads */}
                             <input
                                 type="file"
                                 name="images"
@@ -1028,6 +1009,15 @@ const AdminBlogList = ({
                                 onChange={handleImagesChange}
                                 ref={imagesRef}
                                 multiple
+                            />
+                        </div>
+
+                        <div>
+                            <span className="">Description</span>
+
+                            <TextEditor
+                                onChange={setDescription}
+                                content={selectedItem?.description}
                             />
                         </div>
 
@@ -1042,20 +1032,11 @@ const AdminBlogList = ({
                                 defaultValue={
                                     statusOptions.find(
                                         (status) =>
-                                            status.value ===
+                                            status?.value ===
                                             selectedItem?.status
                                     ) || null
                                 }
                                 required
-                            />
-                        </div>
-
-                        <div>
-                            <span className="">Description</span>
-
-                            <TextEditor
-                                onChange={setDescription}
-                                content={selectedItem?.description}
                             />
                         </div>
 

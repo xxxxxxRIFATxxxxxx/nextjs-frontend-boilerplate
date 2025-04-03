@@ -35,7 +35,7 @@ const NotificationTab = () => {
 
     // count unseen notifications
     const unseenCount = notifications.filter(
-        (notif) => !notif.seenBy.some((userObj) => userObj._id === user?._id)
+        (notif) => !notif.seenBy.some((userObj) => userObj?._id === user?._id)
     ).length;
 
     // mark a single notification as seen
@@ -95,11 +95,11 @@ const NotificationTab = () => {
                                     key={notif?._id}
                                     className="relative p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm flex flex-col"
                                     onClick={() =>
-                                        handleNotificationClick(notif._id)
+                                        handleNotificationClick(notif?._id)
                                     }
                                 >
                                     {!notif.seenBy.some(
-                                        (userObj) => userObj._id === user?._id
+                                        (userObj) => userObj?._id === user?._id
                                     ) && (
                                         <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                                     )}

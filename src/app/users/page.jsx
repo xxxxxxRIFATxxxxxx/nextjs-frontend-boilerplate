@@ -4,6 +4,11 @@ import UserList from "@/components/users/UserList";
 import Error from "@/components/common/Error";
 import fetchData from "@/helpers/fetchData";
 
+export const metadata = {
+    title: "Next JS Frontend Boilerplate - Users",
+    description: "Next JS Frontend Boilerplate",
+};
+
 const Users = async () => {
     const usersResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users`

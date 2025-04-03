@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Maintenance from "@/components/common/Maintenance";
 import { AuthProvider } from "@/context/AuthProvider";
 import { NotificationProvider } from "@/context/NotificationProvider";
 import "@/styles/globals.css";
@@ -17,6 +18,9 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+    const isMaintenanceMode =
+        process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
+
     return (
         <html lang="en">
             <head>
@@ -32,9 +36,14 @@ export default function RootLayout({ children }) {
 
             <body className={`${poppins.variable}`}>
                 <ToastContainer theme="colored" />
-                <AuthProvider>
-                    <NotificationProvider>{children}</NotificationProvider>
-                </AuthProvider>
+
+                {isMaintenanceMode ? (
+                    <Maintenance />
+                ) : (
+                    <AuthProvider>
+                        <NotificationProvider>{children}</NotificationProvider>
+                    </AuthProvider>
+                )}
             </body>
         </html>
     );

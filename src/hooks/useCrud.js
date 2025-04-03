@@ -1,7 +1,7 @@
 "use client";
-import getAuthHeaders from "@/helpers/getAuthHeaders";
-import axios from "axios";
 import { useState } from "react";
+import axios from "axios";
+import getAuthHeaders from "@/helpers/getAuthHeaders";
 
 const useCrud = (endpoint) => {
     const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ const useCrud = (endpoint) => {
                 data,
                 { headers: getAuthHeaders() }
             );
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||
@@ -38,7 +38,7 @@ const useCrud = (endpoint) => {
                 data,
                 { headers: getAuthHeaders() }
             );
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||
@@ -59,7 +59,7 @@ const useCrud = (endpoint) => {
                 `${process.env.NEXT_PUBLIC_API_URL}/api/${endpoint}/${id}`,
                 { headers: getAuthHeaders() }
             );
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||
@@ -83,7 +83,7 @@ const useCrud = (endpoint) => {
                     data: { ids },
                 }
             );
-            return response.data;
+            return response?.data;
         } catch (error) {
             return (
                 error?.response?.data?.error ||

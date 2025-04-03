@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+export const metadata = {
+    title: "Next JS Frontend Boilerplate - Unauthorized",
+    description: "Next JS Frontend Boilerplate",
+};
+
 const Unauthorized = () => {
     return (
         <section>

@@ -121,18 +121,18 @@ const UserBlogList = ({
         // sort by newest or oldest
         if (sortBy === "newest") {
             filtered.sort(
-                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                (a, b) => new Date(b?.createdAt) - new Date(a?.createdAt)
             );
         } else if (sortBy === "oldest") {
             filtered.sort(
-                (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+                (a, b) => new Date(a?.createdAt) - new Date(b?.createdAt)
             );
         }
 
         // search by date time range
         if (startDate && endDate) {
             filtered = filtered.filter((item) => {
-                const itemDate = new Date(item.createdAt).getTime();
+                const itemDate = new Date(item?.createdAt).getTime();
                 return (
                     itemDate >= new Date(startDate).getTime() &&
                     itemDate <= new Date(endDate).getTime()
@@ -168,7 +168,7 @@ const UserBlogList = ({
         <div>
             <div>
                 <h1>Blog List</h1>
-                <h2>Total Blogs: {filteredItems.length}</h2>
+                <h2>Total Blogs: {filteredItems?.length}</h2>
             </div>
 
             <div>
@@ -203,7 +203,7 @@ const UserBlogList = ({
                             })),
                         ]}
                         onChange={(selectedOption) =>
-                            setCategoryFilter(selectedOption.value)
+                            setCategoryFilter(selectedOption?.value)
                         }
                         className=""
                         placeholder="Search and select category"
@@ -238,7 +238,7 @@ const UserBlogList = ({
                             })),
                         ]}
                         onChange={(selectedOption) =>
-                            setCreatedByFilter(selectedOption.value)
+                            setCreatedByFilter(selectedOption?.value)
                         }
                         className=""
                         placeholder="Search and select user"
@@ -270,7 +270,7 @@ const UserBlogList = ({
                             { label: "Oldest", value: "oldest" },
                         ]}
                         onChange={(selectedOption) =>
-                            setSortBy(selectedOption.value)
+                            setSortBy(selectedOption?.value)
                         }
                         className=""
                         placeholder="Select sorting order"
@@ -332,7 +332,7 @@ const UserBlogList = ({
 
             {/* blog list */}
             <div>
-                {filteredItems.length === 0 ? (
+                {filteredItems?.length === 0 ? (
                     <div>No blogs found.</div>
                 ) : (
                     filteredItems.map((item, index) => (

@@ -19,8 +19,8 @@ export async function generateMetadata({ params }) {
     }
 
     return {
-        title: `${blog.title}`,
-        description: blog?.description,
+        title: `Next JS Frontend Boilerplate - ${blog.title}`,
+        description: `Next JS Frontend Boilerplate- ${blog?.description}`,
     };
 }
 

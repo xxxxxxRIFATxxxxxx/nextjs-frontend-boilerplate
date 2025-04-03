@@ -4,6 +4,11 @@ import Error from "@/components/common/Error";
 import BlogCategoryList from "@/components/blogCategories/BlogCategoryList";
 import fetchData from "@/helpers/fetchData";
 
+export const metadata = {
+    title: "Next JS Frontend Boilerplate - Blog Categories",
+    description: "Next JS Frontend Boilerplate",
+};
+
 const BlogCategories = async () => {
     const blogCategoriesResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`

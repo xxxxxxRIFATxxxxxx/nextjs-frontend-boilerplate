@@ -12,7 +12,7 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
         if (!loading) {
             if (!user) {
                 router.replace("/login");
-            } else if (!allowedRoles.includes(user.role)) {
+            } else if (!allowedRoles.includes(user?.role)) {
                 router.replace("/unauthorized");
             }
         }
@@ -20,7 +20,7 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
 
     if (loading) return <FullPageSpinner />;
 
-    return user && allowedRoles.includes(user.role) ? children : null;
+    return user && allowedRoles.includes(user?.role) ? children : null;
 };
 
 export default PrivateRoute;

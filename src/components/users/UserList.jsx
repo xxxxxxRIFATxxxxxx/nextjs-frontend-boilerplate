@@ -135,7 +135,6 @@ const UserList = ({ initialUsers }) => {
         const username = e.target.username.value.trim();
         const password = e.target.password.value.trim();
         const roleValue = role?.value;
-        const statusValue = status?.value;
         const dateOfBirth = e.target.dateOfBirth.value
             ? new Date(e.target.dateOfBirth.value)
             : null;
@@ -144,6 +143,7 @@ const UserList = ({ initialUsers }) => {
         const state = e.target.state.value.trim() || null;
         const zipCode = e.target.zipCode.value.trim() || null;
         const country = e.target.country.value.trim() || null;
+        const statusValue = status?.value;
 
         let imageUrl = selectedItem?.image;
 
@@ -151,9 +151,9 @@ const UserList = ({ initialUsers }) => {
             const responseFile = await uploadSingleFile(userImage);
 
             if (responseFile?.error) {
-                return toast.error(responseFile.error);
+                return toast.error(responseFile?.error);
             } else {
-                imageUrl = responseFile.data.fileUrl;
+                imageUrl = responseFile?.data?.fileUrl;
             }
         }
 
@@ -163,11 +163,11 @@ const UserList = ({ initialUsers }) => {
             phone,
             username,
             role: roleValue,
-            status: statusValue,
             image: imageUrl,
             dateOfBirth,
             address: { street, city, state, zipCode, country },
             bio,
+            status: statusValue,
         };
 
         if (password) {
@@ -175,14 +175,14 @@ const UserList = ({ initialUsers }) => {
         }
 
         if (selectedItem) {
-            const response = await updateItem(selectedItem._id, userData);
+            const response = await updateItem(selectedItem?._id, userData);
 
             if (response?.data) {
                 const updatedItem = response?.data;
 
                 setFilteredItems((prev) =>
                     prev.map((item) =>
-                        item._id === selectedItem._id
+                        item?._id === selectedItem?._id
                             ? {
                                   ...updatedItem,
                               }
@@ -190,7 +190,6 @@ const UserList = ({ initialUsers }) => {
                     )
                 );
                 toast.success(response?.message);
-                setBio("");
                 closeAddOrEditModal();
             } else {
                 toast.error(response);
@@ -209,7 +208,6 @@ const UserList = ({ initialUsers }) => {
                 ]);
 
                 toast.success(response?.message);
-                setBio("");
                 closeAddOrEditModal();
             } else {
                 toast.error(response);
@@ -219,11 +217,11 @@ const UserList = ({ initialUsers }) => {
 
     // handle item deletion
     const handleDelete = async () => {
-        const response = await deleteItem(selectedItem._id);
+        const response = await deleteItem(selectedItem?._id);
 
         if (response?.message) {
             setFilteredItems((prev) =>
-                prev.filter((item) => item._id !== selectedItem._id)
+                prev.filter((item) => item?._id !== selectedItem?._id)
             );
             toast.success(response?.message);
             setIsDeleteModalOpen(false);
@@ -236,7 +234,7 @@ const UserList = ({ initialUsers }) => {
     const handleSelectAll = () => {
         setSelectAll(!selectAll);
         setSelectedItems(
-            selectAll ? [] : filteredItems.map((item) => item._id)
+            selectAll ? [] : filteredItems.map((item) => item?._id)
         );
     };
 
@@ -257,7 +255,7 @@ const UserList = ({ initialUsers }) => {
 
         if (response?.message) {
             setFilteredItems((prev) =>
-                prev.filter((item) => !selectedItems.includes(item._id))
+                prev.filter((item) => !selectedItems.includes(item?._id))
             );
             toast.success(response?.message);
             setSelectedItems([]);
@@ -272,8 +270,9 @@ const UserList = ({ initialUsers }) => {
     const removeExixtingItems = () => {
         setSelectedItem(null);
         setRole(null);
-        setStatus(null);
         setUserImage(null);
+        setBio("");
+        setStatus(null);
     };
 
     // for preview user image
@@ -318,17 +317,17 @@ const UserList = ({ initialUsers }) => {
         // sort by newest or oldest
         if (sortBy === "newest") {
             filtered.sort(
-                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                (a, b) => new Date(b?.createdAt) - new Date(a?.createdAt)
             );
         } else if (sortBy === "oldest") {
             filtered.sort(
-                (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+                (a, b) => new Date(a?.createdAt) - new Date(b?.createdAt)
             );
         }
 
         // filter by status
         if (itemStatus !== "all") {
-            filtered = filtered.filter((item) => item.status === itemStatus);
+            filtered = filtered.filter((item) => item?.status === itemStatus);
         }
 
         // search by date time range
@@ -348,13 +347,14 @@ const UserList = ({ initialUsers }) => {
     // update state when selectedItem changes
     useEffect(() => {
         setRole(
-            roleOptions.find((option) => option.value === selectedItem?.role) ||
-                null
+            roleOptions.find(
+                (option) => option?.value === selectedItem?.role
+            ) || null
         );
 
         setStatus(
             statusOptions.find(
-                (option) => option.value === selectedItem?.status
+                (option) => option?.value === selectedItem?.status
             ) || null
         );
 
@@ -374,7 +374,7 @@ const UserList = ({ initialUsers }) => {
         <div>
             <div>
                 <h1>User List</h1>
-                <h2>Total Users: {filteredItems.length}</h2>
+                <h2>Total Users: {filteredItems?.length}</h2>
             </div>
 
             <div>
@@ -406,7 +406,7 @@ const UserList = ({ initialUsers }) => {
                             { label: "Oldest", value: "oldest" },
                         ]}
                         onChange={(selectedOption) =>
-                            setSortBy(selectedOption.value)
+                            setSortBy(selectedOption?.value)
                         }
                         className=""
                         placeholder="Select sorting order"
@@ -436,7 +436,7 @@ const UserList = ({ initialUsers }) => {
                             { label: "Banned", value: "banned" },
                         ]}
                         onChange={(selectedOption) =>
-                            setItemStatus(selectedOption.value)
+                            setItemStatus(selectedOption?.value)
                         }
                         className=""
                         placeholder="Select status"
@@ -574,11 +574,11 @@ const UserList = ({ initialUsers }) => {
 
                             <th>Role</th>
 
-                            <th>Status</th>
-
                             <th>Date of birth</th>
 
                             <th>Last login</th>
+
+                            <th>Status</th>
 
                             <th>Created</th>
 
@@ -589,7 +589,7 @@ const UserList = ({ initialUsers }) => {
                     </thead>
 
                     <tbody>
-                        {filteredItems.length === 0 ? (
+                        {filteredItems?.length === 0 ? (
                             <tr>
                                 <td colSpan="15" className="text-center">
                                     No users found.
@@ -660,8 +660,6 @@ const UserList = ({ initialUsers }) => {
 
                                     <td>{item?.role}</td>
 
-                                    <td>{item?.status}</td>
-
                                     <td>
                                         {item?.dateOfBirth ? (
                                             <span>
@@ -683,6 +681,8 @@ const UserList = ({ initialUsers }) => {
                                             <span>-</span>
                                         )}
                                     </td>
+
+                                    <td>{item?.status}</td>
 
                                     <td>{formatDateTime(item?.createdAt)}</td>
 
@@ -819,26 +819,7 @@ const UserList = ({ initialUsers }) => {
                                 defaultValue={
                                     roleOptions.find(
                                         (role) =>
-                                            role.value === selectedItem?.role
-                                    ) || null
-                                }
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <span className="">Status</span>
-
-                            <Select
-                                options={statusOptions}
-                                onChange={setStatus}
-                                className=""
-                                placeholder="Select status"
-                                defaultValue={
-                                    statusOptions.find(
-                                        (status) =>
-                                            status.value ===
-                                            selectedItem?.status
+                                            role?.value === selectedItem?.role
                                     ) || null
                                 }
                                 required
@@ -994,6 +975,25 @@ const UserList = ({ initialUsers }) => {
                         </div>
 
                         <div>
+                            <span className="">Status</span>
+
+                            <Select
+                                options={statusOptions}
+                                onChange={setStatus}
+                                className=""
+                                placeholder="Select status"
+                                defaultValue={
+                                    statusOptions.find(
+                                        (status) =>
+                                            status?.value ===
+                                            selectedItem?.status
+                                    ) || null
+                                }
+                                required
+                            />
+                        </div>
+
+                        <div>
                             <button type="submit">
                                 {loading ? (
                                     <Spinner />
@@ -1112,11 +1112,6 @@ const UserList = ({ initialUsers }) => {
                         </div>
 
                         <div>
-                            <h2>Status</h2>
-                            <p>{selectedItem?.status}</p>
-                        </div>
-
-                        <div>
                             <h2>Date of birth</h2>
                             {selectedItem?.dateOfBirth && (
                                 <p>{formatDate(selectedItem?.dateOfBirth)}</p>
@@ -1144,6 +1139,11 @@ const UserList = ({ initialUsers }) => {
                         <div>
                             <h2>Last login</h2>
                             <p>{formatDateTime(selectedItem?.lastLogin)}</p>
+                        </div>
+
+                        <div>
+                            <h2>Status</h2>
+                            <p>{selectedItem?.status}</p>
                         </div>
 
                         <div>
