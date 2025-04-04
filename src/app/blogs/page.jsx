@@ -11,15 +11,15 @@ export const metadata = {
 
 const Blogs = async () => {
     const blogsResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/get/only/active`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/active`
     );
 
     const blogCategoriesResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/get/only/active`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/active`
     );
 
     const usersResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/get/only/active`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/active`
     );
 
     // extract data or error messages

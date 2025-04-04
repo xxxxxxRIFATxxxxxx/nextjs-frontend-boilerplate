@@ -15,7 +15,7 @@ const BlogDetailsClient = ({ initialBlog, slug }) => {
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
         const updatedBlogResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/get/only/active/slug/${slug}`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/active/slug/${slug}`
         );
 
         const updatedBlog = updatedBlogResponse?.data || null;

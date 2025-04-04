@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
         if (token && userId) {
             const decoded = decodeToken(token);
             if (decoded) {
-                fetchUser(userId);
+                fetchUser();
                 scheduleAutoLogout(decoded.exp);
             } else {
                 logout();
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
         socket.on("usersUpdated", async (change) => {
             if (user && change.documentKey?._id === user?._id) {
                 // fetch latest user data if the logged-in user was updated
-                await fetchUser(user?._id);
+                await fetchUser();
             }
         });
 
@@ -72,12 +72,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const fetchUser = async (userId) => {
+    const fetchUser = async () => {
         try {
             setLoading(true);
 
             const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/${userId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/`,
                 { headers: getAuthHeaders() }
             );
 
@@ -150,7 +150,7 @@ export const AuthProvider = ({ children }) => {
     const updateProfile = async (updates) => {
         try {
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/users/update-profile`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile`,
                 updates,
                 { headers: getAuthHeaders() }
             );

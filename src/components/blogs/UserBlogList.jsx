@@ -35,15 +35,15 @@ const UserBlogList = ({
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
         const updatedBlogsResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/get/only/active`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/active`
         );
 
         const updatedCategoriesResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/get/only/active`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/active`
         );
 
         const updatedUsersResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/users/get/only/active`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users/active`
         );
 
         const updatedBlogs = updatedBlogsResponse?.data || [];

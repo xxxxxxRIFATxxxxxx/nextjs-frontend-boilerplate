@@ -34,7 +34,7 @@ export const NotificationProvider = ({ children }) => {
             setLoading(true);
 
             const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/user-specific-notifications`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/my-notifications`,
                 { headers: getAuthHeaders() }
             );
 
@@ -53,12 +53,12 @@ export const NotificationProvider = ({ children }) => {
         }
     };
 
-    const markSingleNotificationAsSeen = async (notificationId) => {
+    const markNotificationAsSeen = async (notificationId) => {
         try {
             if (!notificationId) return;
 
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/user-specific-notifications/seen/${notificationId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/my-notifications/seen/${notificationId}`,
                 {}, // no body needed as id is in the URL
                 { headers: getAuthHeaders() }
             );
@@ -83,7 +83,7 @@ export const NotificationProvider = ({ children }) => {
         }
     };
 
-    const markMultipleNotificationAsSeen = async () => {
+    const markNotificationsAsSeen = async () => {
         try {
             const unseenNotificationIds = notifications
                 .filter(
@@ -95,7 +95,7 @@ export const NotificationProvider = ({ children }) => {
             if (unseenNotificationIds.length === 0) return; // no unseen notifications
 
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/user-specific-notifications/seen`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/my-notifications/seen`,
                 { notificationIds: unseenNotificationIds }, // send array of ids
                 { headers: getAuthHeaders() }
             );
@@ -126,8 +126,8 @@ export const NotificationProvider = ({ children }) => {
                 notifications,
                 loading,
                 fetchNotifications,
-                markSingleNotificationAsSeen,
-                markMultipleNotificationAsSeen,
+                markNotificationAsSeen,
+                markNotificationsAsSeen,
             }}
         >
             {children}

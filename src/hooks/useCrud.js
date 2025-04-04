@@ -77,7 +77,7 @@ const useCrud = (endpoint) => {
         setError(null);
         try {
             const response = await axios.delete(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/${endpoint}/bulk/delete`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/${endpoint}/bulk-delete`,
                 {
                     headers: getAuthHeaders(),
                     data: { ids },

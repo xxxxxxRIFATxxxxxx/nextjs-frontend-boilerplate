@@ -8,7 +8,7 @@ export async function generateMetadata({ params }) {
     const { slug } = await params;
 
     const blogResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/get/only/active/slug/${slug}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/active/slug/${slug}`
     );
 
     const blog = blogResponse?.data || null;
@@ -28,7 +28,7 @@ const BlogDetails = async ({ params }) => {
     const { slug } = await params;
 
     const blogResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/get/only/active/slug/${slug}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/active/slug/${slug}`
     );
 
     const initialBlog = blogResponse?.data || null;
