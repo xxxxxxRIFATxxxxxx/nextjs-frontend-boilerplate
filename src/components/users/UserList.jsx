@@ -129,7 +129,6 @@ const UserList = ({ initialUsers }) => {
     const handleSave = async (e) => {
         e.preventDefault();
 
-        const title = e.target.title.value.trim();
         const fullName = e.target.fullName.value.trim();
         const email = e.target.email.value.trim();
         const phone = e.target.phone.value.trim();
@@ -159,7 +158,6 @@ const UserList = ({ initialUsers }) => {
         }
 
         const userData = {
-            title,
             fullName,
             email,
             phone,
@@ -191,6 +189,7 @@ const UserList = ({ initialUsers }) => {
                             : item
                     )
                 );
+
                 toast.success(response?.message);
                 closeAddOrEditModal();
             } else {
@@ -304,8 +303,6 @@ const UserList = ({ initialUsers }) => {
             filtered = filtered.filter((item) =>
                 [
                     item?._id?.toString(),
-                    item?.title,
-                    item?.slug,
                     item?.fullName,
                     item?.email,
                     item?.phone,
@@ -525,8 +522,6 @@ const UserList = ({ initialUsers }) => {
                     filename="users.csv"
                     selectedColumns={[
                         "_id",
-                        "title",
-                        "slug",
                         "fullName",
                         "email",
                         "phone",
@@ -570,10 +565,6 @@ const UserList = ({ initialUsers }) => {
 
                             <th>Id</th>
 
-                            <th>Title</th>
-
-                            <th>Slug</th>
-
                             <th>Full name</th>
 
                             <th>Email</th>
@@ -601,7 +592,7 @@ const UserList = ({ initialUsers }) => {
                     <tbody>
                         {filteredItems?.length === 0 ? (
                             <tr>
-                                <td colSpan="17" className="text-center">
+                                <td colSpan="15" className="text-center">
                                     No users found.
                                 </td>
                             </tr>
@@ -652,17 +643,6 @@ const UserList = ({ initialUsers }) => {
                                             {item?._id}
                                         </span>
                                     </td>
-
-                                    <td>
-                                        <span
-                                            className="hover:underline cursor-pointer"
-                                            onClick={() => openViewModal(item)}
-                                        >
-                                            {item?.title}
-                                        </span>
-                                    </td>
-
-                                    <td>{item?.slug}</td>
 
                                     <td>
                                         <span
@@ -754,23 +734,6 @@ const UserList = ({ initialUsers }) => {
             >
                 <div>
                     <form onSubmit={handleSave}>
-                        <div>
-                            <label htmlFor="title" className="">
-                                Title
-                            </label>
-
-                            <input
-                                type="text"
-                                name="title"
-                                id="title"
-                                autoComplete="off"
-                                className=""
-                                placeholder="Enter title"
-                                defaultValue={selectedItem?.title || ""}
-                                required
-                            />
-                        </div>
-
                         <div>
                             <label htmlFor="fullName" className="">
                                 Full Name
@@ -1056,7 +1019,11 @@ const UserList = ({ initialUsers }) => {
                         </div>
 
                         <div>
-                            <button type="submit">
+                            <button
+                                type="submit"
+                                className="disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={loading}
+                            >
                                 {loading ? (
                                     <Spinner />
                                 ) : selectedItem ? (
@@ -1146,16 +1113,6 @@ const UserList = ({ initialUsers }) => {
                         <div>
                             <h2>Id</h2>
                             <p>{selectedItem?._id}</p>
-                        </div>
-
-                        <div>
-                            <h2>Title</h2>
-                            <p>{selectedItem?.title}</p>
-                        </div>
-
-                        <div>
-                            <h2>Slug</h2>
-                            <p>{selectedItem?.slug}</p>
                         </div>
 
                         <div>

@@ -165,13 +165,17 @@ const SignupContent = () => {
 
                     <label htmlFor="terms-and-conditions" className="">
                         I accept the{" "}
-                        <Link className="" href="/terms-and-conditions">
+                        <Link href="/terms-and-conditions" target="_blank">
                             Terms and Conditions
                         </Link>
                     </label>
                 </div>
 
-                <button type="submit" className="" disabled={loading}>
+                <button
+                    type="submit"
+                    className="disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={loading}
+                >
                     {loading ? <Spinner /> : <span>Create an account</span>}
                 </button>
 

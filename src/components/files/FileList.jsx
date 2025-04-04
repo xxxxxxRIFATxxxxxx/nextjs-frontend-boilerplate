@@ -280,7 +280,7 @@ const FileList = ({ initialFiles }) => {
         if (search) {
             const searchLower = search.toLowerCase();
             filtered = filtered.filter((item) =>
-                [item?._id?.toString(), item?.title, item?.slug, item?.status]
+                [item?._id?.toString(), item?.title, item?.status]
                     .map((field) => field?.toLowerCase() ?? "")
                     .some((field) => field?.includes(searchLower))
             );
@@ -484,7 +484,6 @@ const FileList = ({ initialFiles }) => {
                     selectedColumns={[
                         "_id",
                         "title",
-                        "slug",
                         "files",
                         "status",
                         "createdAt",
@@ -517,8 +516,6 @@ const FileList = ({ initialFiles }) => {
                             <th>Id</th>
 
                             <th>Title</th>
-
-                            <th>Slug</th>
 
                             <th>Files</th>
 
@@ -576,8 +573,6 @@ const FileList = ({ initialFiles }) => {
                                             {item?.title}
                                         </span>
                                     </td>
-
-                                    <td>{item?.slug}</td>
 
                                     <td className="grid grid-cols-1">
                                         {item?.files?.map((file, index) => (
@@ -745,7 +740,11 @@ const FileList = ({ initialFiles }) => {
                         </div>
 
                         <div>
-                            <button type="submit">
+                            <button
+                                type="submit"
+                                className="disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={loading}
+                            >
                                 {loading ? (
                                     <Spinner />
                                 ) : selectedItem ? (
@@ -819,11 +818,6 @@ const FileList = ({ initialFiles }) => {
                         <div>
                             <h2>Title</h2>
                             <p>{selectedItem?.title}</p>
-                        </div>
-
-                        <div>
-                            <h2>Slug</h2>
-                            <p>{selectedItem?.slug}</p>
                         </div>
 
                         <div>

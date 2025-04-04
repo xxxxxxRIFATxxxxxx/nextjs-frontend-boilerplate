@@ -133,7 +133,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
     const handleSave = async (e) => {
         e.preventDefault();
 
-        const title = e.target.title.value.trim();
         const message = e.target.message.value.trim();
         const seenByIds = seenBy.map((user) => user?.value);
         const specificUserIds = specificUsers.map((user) => user?.value);
@@ -143,7 +142,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
         if (selectedItem) {
             const response = await updateItem(selectedItem?._id, {
-                title,
                 message,
                 seenBy: seenByIds,
                 specificUsers: specificUserIds,
@@ -171,7 +169,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
             }
         } else {
             const response = await createItem({
-                title,
                 message,
                 seenBy: seenByIds,
                 specificUsers: specificUserIds,
@@ -266,13 +263,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
         if (search) {
             const searchLower = search.toLowerCase();
             filtered = filtered.filter((item) =>
-                [
-                    item?._id?.toString(),
-                    item?.title,
-                    item?.slug,
-                    item?.message,
-                    item?.status,
-                ]
+                [item?._id?.toString(), item?.message, item?.status]
                     .map((field) => field?.toLowerCase() ?? "")
                     .some((field) => field?.includes(searchLower))
             );
@@ -496,8 +487,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                     filename="notifications.csv"
                     selectedColumns={[
                         "_id",
-                        "title",
-                        "slug",
                         "message",
                         "recipientRoles",
                         "targetUrl",
@@ -528,10 +517,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
 
                             <th>Id</th>
 
-                            <th>Title</th>
-
-                            <th>Slug</th>
-
                             <th>Message</th>
 
                             <th>Specific Users</th>
@@ -553,7 +538,7 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                     <tbody>
                         {filteredItems?.length === 0 ? (
                             <tr>
-                                <td colSpan="13" className="text-center">
+                                <td colSpan="11" className="text-center">
                                     No notifications found.
                                 </td>
                             </tr>
@@ -585,17 +570,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                                             {item?._id}
                                         </span>
                                     </td>
-
-                                    <td>
-                                        <span
-                                            className="hover:underline cursor-pointer"
-                                            onClick={() => openViewModal(item)}
-                                        >
-                                            {item?.title}
-                                        </span>
-                                    </td>
-
-                                    <td>{item?.slug}</td>
 
                                     <td>
                                         <span
@@ -679,23 +653,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
             >
                 <div>
                     <form onSubmit={handleSave}>
-                        <div>
-                            <label htmlFor="title" className="">
-                                Title
-                            </label>
-
-                            <input
-                                type="text"
-                                name="title"
-                                id="title"
-                                autoComplete="off"
-                                className=""
-                                placeholder="Enter title"
-                                defaultValue={selectedItem?.title || ""}
-                                required
-                            />
-                        </div>
-
                         <div>
                             <label htmlFor="message" className="">
                                 Message
@@ -808,7 +765,11 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                         </div>
 
                         <div>
-                            <button type="submit">
+                            <button
+                                type="submit"
+                                className="disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={loading}
+                            >
                                 {loading ? (
                                     <Spinner />
                                 ) : selectedItem ? (
@@ -877,16 +838,6 @@ const NotificationList = ({ initialNotifications, initialUsers }) => {
                         <div>
                             <h2>Id</h2>
                             <p>{selectedItem?._id}</p>
-                        </div>
-
-                        <div>
-                            <h2>Title</h2>
-                            <p>{selectedItem?.title}</p>
-                        </div>
-
-                        <div>
-                            <h2>Slug</h2>
-                            <p>{selectedItem?.slug}</p>
                         </div>
 
                         <div>

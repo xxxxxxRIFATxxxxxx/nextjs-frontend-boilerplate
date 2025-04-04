@@ -405,7 +405,7 @@ const AdminBlogList = ({
                     item?._id?.toString(),
                     item?.title,
                     item?.slug,
-                    item?.category?.name,
+                    item?.category?.title,
                     item?.status,
                     item?.createdBy?.fullName,
                     item?.createdBy?.email,
@@ -456,7 +456,7 @@ const AdminBlogList = ({
                     blogCategory?._id === selectedItem?.category?._id
             )
                 ? {
-                      label: selectedItem?.category?.name,
+                      label: selectedItem?.category?.title,
                       value: selectedItem?.category?._id,
                   }
                 : null
@@ -755,7 +755,7 @@ const AdminBlogList = ({
 
                                     <td>{item?.slug}</td>
 
-                                    <td>{item?.category?.name}</td>
+                                    <td>{item?.category?.title}</td>
 
                                     <td>{item?.createdBy?.fullName}</td>
 
@@ -835,7 +835,7 @@ const AdminBlogList = ({
                                 id="category"
                                 options={blogCategories.map((blogCategory) => ({
                                     value: blogCategory?._id,
-                                    label: blogCategory?.name,
+                                    label: blogCategory?.title,
                                 }))}
                                 onChange={setCategory}
                                 className=""
@@ -1049,7 +1049,11 @@ const AdminBlogList = ({
                         </div>
 
                         <div>
-                            <button type="submit">
+                            <button
+                                type="submit"
+                                className="disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={loading}
+                            >
                                 {loading ? (
                                     <Spinner />
                                 ) : selectedItem ? (
@@ -1179,7 +1183,7 @@ const AdminBlogList = ({
 
                         <div>
                             <h2>Category</h2>
-                            <p>{selectedItem?.category?.name}</p>
+                            <p>{selectedItem?.category?.title}</p>
                         </div>
 
                         <div>

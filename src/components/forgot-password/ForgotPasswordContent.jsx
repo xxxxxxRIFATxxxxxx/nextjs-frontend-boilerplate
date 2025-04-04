@@ -51,7 +51,11 @@ const ForgotPasswordContent = () => {
                     />
                 </div>
 
-                <button type="submit" className="" disabled={loading}>
+                <button
+                    type="submit"
+                    className="disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={loading}
+                >
                     {loading ? <Spinner /> : <span>Send Reset Link</span>}
                 </button>
             </form>

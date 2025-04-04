@@ -111,7 +111,7 @@ const BlogDetailsClient = ({ initialBlog, slug }) => {
 
             <div>
                 <h2>Category</h2>
-                <p>{blog?.category?.name}</p>
+                <p>{blog?.category?.title}</p>
             </div>
 
             <div>

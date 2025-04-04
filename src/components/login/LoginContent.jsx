@@ -71,7 +71,12 @@ const LoginContent = () => {
                         required
                     />
                 </div>
-                <button type="submit" className="" disabled={loading}>
+
+                <button
+                    type="submit"
+                    className="disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={loading}
+                >
                     {loading ? <Spinner /> : <span>Login</span>}
                 </button>
 

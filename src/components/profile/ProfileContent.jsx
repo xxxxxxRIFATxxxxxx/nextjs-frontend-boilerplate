@@ -24,7 +24,6 @@ const ProfileContent = () => {
 
         setLoading(true);
 
-        const title = e.target.title.value.trim();
         const fullName = e.target.fullName.value.trim();
         const email = e.target.email.value.trim();
         const phone = e.target.phone.value.trim();
@@ -62,7 +61,6 @@ const ProfileContent = () => {
         }
 
         const profileData = {
-            title,
             fullName,
             email,
             phone,
@@ -127,11 +125,6 @@ const ProfileContent = () => {
         <section>
             {/* user information */}
             <div>
-                <div>
-                    <h2>Title</h2>
-                    <p>{user?.title}</p>
-                </div>
-
                 <div>
                     <h2>Slug</h2>
                     <p>{user?.slug}</p>
@@ -220,23 +213,6 @@ const ProfileContent = () => {
             >
                 <div>
                     <form onSubmit={handleSave}>
-                        <div>
-                            <label htmlFor="title" className="">
-                                Title
-                            </label>
-
-                            <input
-                                type="text"
-                                name="title"
-                                id="title"
-                                autoComplete="off"
-                                className=""
-                                placeholder="Enter title"
-                                defaultValue={user?.title || ""}
-                                required
-                            />
-                        </div>
-
                         <div>
                             <label htmlFor="fullName" className="">
                                 Full Name
@@ -500,7 +476,11 @@ const ProfileContent = () => {
                         </div>
 
                         <div>
-                            <button type="submit">
+                            <button
+                                type="submit"
+                                className="disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={loading}
+                            >
                                 {loading ? <Spinner /> : <span>Update</span>}
                             </button>
                         </div>

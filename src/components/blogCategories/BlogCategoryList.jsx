@@ -41,14 +41,14 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
-        const updatedCategoriesResponse = await fetchDataForClient(
+        const updatedBlogCategoriesResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
         );
 
-        const updatedBlogCategories = updatedCategoriesResponse?.data || [];
+        const updatedBlogCategories = updatedBlogCategoriesResponse?.data || [];
 
         const updatedBlogCategoriesError =
-            updatedCategoriesResponse?.error || null;
+            updatedBlogCategoriesResponse?.error || null;
 
         if (updatedBlogCategoriesError) {
             const errorMessage = [updatedBlogCategoriesError]
@@ -618,7 +618,11 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                         </div>
 
                         <div>
-                            <button type="submit">
+                            <button
+                                type="submit"
+                                className="disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={loading}
+                            >
                                 {loading ? (
                                     <Spinner />
                                 ) : selectedItem ? (
@@ -642,7 +646,7 @@ const BlogCategoryList = ({ initialBlogCategories }) => {
                 <div>
                     <p>
                         Are you sure you want to delete <br />
-                        {selectedItem?.name} ?
+                        {selectedItem?.title} ?
                     </p>
 
                     <button type="button" onClick={closeDeleteModal}>

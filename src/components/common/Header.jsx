@@ -44,7 +44,9 @@ const Header = () => {
                 <Link href="/">Home</Link>
                 <Link href="/blogs">Blogs</Link>
                 {user ? (
-                    <button onClick={logout}>Logout</button>
+                    <button onClick={logout} className="cursor-pointer">
+                        Logout
+                    </button>
                 ) : (
                     <Link href="/login">Login</Link>
                 )}

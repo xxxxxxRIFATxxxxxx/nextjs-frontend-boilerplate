@@ -98,7 +98,7 @@ const UserBlogList = ({
                     item?._id?.toString(),
                     item?.title,
                     item?.slug,
-                    item?.category?.name,
+                    item?.category?.title,
                     item?.status,
                     item?.createdBy?.fullName,
                     item?.createdBy?.email,
@@ -114,7 +114,7 @@ const UserBlogList = ({
         // filter by category
         if (categoryFilter !== "all") {
             filtered = filtered.filter(
-                (item) => item?.category?.name === categoryFilter
+                (item) => item?.category?.title === categoryFilter
             );
         }
 
@@ -205,8 +205,8 @@ const UserBlogList = ({
                         options={[
                             { label: "All", value: "all" },
                             ...blogCategories.map((blogCategory) => ({
-                                label: blogCategory?.name,
-                                value: blogCategory?.name,
+                                label: blogCategory?.title,
+                                value: blogCategory?.title,
                             })),
                         ]}
                         onChange={(selectedOption) =>
@@ -222,9 +222,9 @@ const UserBlogList = ({
                                               ? "All"
                                               : blogCategories.find(
                                                     (blogCategory) =>
-                                                        blogCategory?.name ===
+                                                        blogCategory?.title ===
                                                         categoryFilter
-                                                )?.name || "All",
+                                                )?.title || "All",
                                       value: categoryFilter,
                                   }
                                 : null
@@ -361,7 +361,7 @@ const UserBlogList = ({
 
                             <h2>{item?.title}</h2>
 
-                            <div>{item?.category?.name}</div>
+                            <div>{item?.category?.title}</div>
 
                             <div>{item?.createdBy?.fullName}</div>
 
