@@ -1,18 +1,18 @@
-import Layout from "@/components/common/Layout";
 import PublicRoute from "@/components/common/PublicRoute";
-import SignupContent from "@/components/signup/SignupContent";
+import SignupContent from "@/components/common/SignupContent";
+import UserLayout from "@/components/user/UserLayout";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Signup",
-    description: "Next JS Frontend Boilerplate",
+    title: `Signup | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const Signup = () => {
     return (
         <PublicRoute>
-            <Layout>
+            <UserLayout>
                 <SignupContent />
-            </Layout>
+            </UserLayout>
         </PublicRoute>
     );
 };

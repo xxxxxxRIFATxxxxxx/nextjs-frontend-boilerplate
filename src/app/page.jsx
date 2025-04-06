@@ -1,15 +1,17 @@
-import Layout from "@/components/common/Layout";
+import UserLayout from "@/components/user/UserLayout";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Home",
-    description: "Next JS Frontend Boilerplate",
+    title: `Home | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const Home = async () => {
     return (
-        <Layout>
-            <section className="h-screen">Home</section>
-        </Layout>
+        <UserLayout>
+            <section className="h-screen">
+                <p>Home</p>
+            </section>
+        </UserLayout>
     );
 };
 

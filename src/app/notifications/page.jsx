@@ -1,53 +1,45 @@
-import Layout from "@/components/common/Layout";
 import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
-import NotificationList from "@/components/notifications/NotificationList";
+import UserLayout from "@/components/user/UserLayout";
+import UserNotificationList from "@/components/user/UserNotificationList";
 import fetchData from "@/helpers/fetchData";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Notifications",
-    description: "Next JS Frontend Boilerplate",
+    title: `Notifications | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const Notifications = async () => {
     const notificationsResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/notifications`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/active`
     );
 
-    const usersResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users`
-    );
-
-    // extract initial data or error messages
+    // extract data or error messages
     const initialNotifications = notificationsResponse?.data || [];
-    const initialUsers = usersResponse?.data || [];
-
     const notificationsError = notificationsResponse?.error || null;
-    const usersError = usersResponse?.error || null;
 
     return (
         <PrivateRoute allowedRoles={["super_admin", "admin", "moderator"]}>
-            <Layout>
+            <UserLayout>
                 {/* error message */}
                 <section>
-                    {(notificationsError || usersError) && (
+                    {notificationsError && (
                         <Error
-                            errorMessage={[notificationsError, usersError]
+                            errorMessage={[notificationsError]
                                 .filter(Boolean)
                                 .join("\n")}
                         />
                     )}
                 </section>
 
-                {!notificationsError && !usersError && (
+                {!notificationsError && (
                     <section>
-                        <NotificationList
+                        <UserNotificationList
                             initialNotifications={initialNotifications}
-                            initialUsers={initialUsers}
                         />
                     </section>
                 )}
-            </Layout>
+            </UserLayout>
         </PrivateRoute>
     );
 };

@@ -1,10 +1,10 @@
-import Layout from "@/components/common/Layout";
 import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
-import BlogDetailsClient from "@/components/blogs/BlogDetailsClient";
+import UserLayout from "@/components/user/UserLayout";
+import UserBlogDetailsContent from "@/components/user/UserBlogDetailsContent";
 import fetchData from "@/helpers/fetchData";
 
-export async function generateMetadata({ params }) {
+export const generateMetadata = async ({ params }) => {
     const { slug } = await params;
 
     const blogResponse = await fetchData(
@@ -15,14 +15,17 @@ export async function generateMetadata({ params }) {
     const blogError = blogResponse?.error || null;
 
     if (blogError || !blog) {
-        return { title: "Blog title", description: "Blog description." };
+        return {
+            title: `Blog title | Next.js Frontend Boilerplate`,
+            description: `Blog description | Next.js Frontend Boilerplate.`,
+        };
     }
 
     return {
-        title: `Next JS Frontend Boilerplate - ${blog.title}`,
-        description: `Next JS Frontend Boilerplate- ${blog?.description}`,
+        title: `${blog?.title} | Next.js Frontend Boilerplate`,
+        description: `${blog?.description} | Next.js Frontend Boilerplate.`,
     };
-}
+};
 
 const BlogDetails = async ({ params }) => {
     const { slug } = await params;
@@ -35,31 +38,25 @@ const BlogDetails = async ({ params }) => {
     const blogError = blogResponse?.error || null;
 
     return (
-        <PrivateRoute
-            allowedRoles={["super_admin", "admin", "moderator", "user"]}
-        >
-            <Layout>
-                {/* error message */}
-                <section>
-                    {blogError && (
-                        <Error
-                            errorMessage={[blogError]
-                                .filter(Boolean)
-                                .join("\n")}
-                        />
-                    )}
-                </section>
-
-                {!blogError && (
-                    <section>
-                        <BlogDetailsClient
-                            initialBlog={initialBlog}
-                            slug={slug}
-                        />
-                    </section>
+        <UserLayout>
+            {/* error message */}
+            <section>
+                {blogError && (
+                    <Error
+                        errorMessage={[blogError].filter(Boolean).join("\n")}
+                    />
                 )}
-            </Layout>
-        </PrivateRoute>
+            </section>
+
+            {!blogError && (
+                <section>
+                    <UserBlogDetailsContent
+                        initialBlog={initialBlog}
+                        slug={slug}
+                    />
+                </section>
+            )}
+        </UserLayout>
     );
 };
 

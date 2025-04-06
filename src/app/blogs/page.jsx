@@ -1,12 +1,11 @@
-import Layout from "@/components/common/Layout";
-import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
-import UserBlogList from "@/components/blogs/UserBlogList";
+import UserLayout from "@/components/user/UserLayout";
+import UserBlogList from "@/components/user/UserBlogList";
 import fetchData from "@/helpers/fetchData";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Blogs",
-    description: "Next JS Frontend Boilerplate",
+    title: `Blogs | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const Blogs = async () => {
@@ -32,36 +31,32 @@ const Blogs = async () => {
     const usersError = usersResponse?.error || null;
 
     return (
-        <PrivateRoute
-            allowedRoles={["super_admin", "admin", "moderator", "user"]}
-        >
-            <Layout>
-                {/* error message */}
-                <section>
-                    {(blogsError || blogCategoriesError || usersError) && (
-                        <Error
-                            errorMessage={[
-                                blogsError,
-                                blogCategoriesError,
-                                usersError,
-                            ]
-                                .filter(Boolean)
-                                .join("\n")}
-                        />
-                    )}
-                </section>
-
-                {!blogsError && !blogCategoriesError && !usersError && (
-                    <section>
-                        <UserBlogList
-                            initialBlogs={initialBlogs}
-                            initialBlogCategories={initialBlogCategories}
-                            initialUsers={initialUsers}
-                        />
-                    </section>
+        <UserLayout>
+            {/* error message */}
+            <section>
+                {(blogsError || blogCategoriesError || usersError) && (
+                    <Error
+                        errorMessage={[
+                            blogsError,
+                            blogCategoriesError,
+                            usersError,
+                        ]
+                            .filter(Boolean)
+                            .join("\n")}
+                    />
                 )}
-            </Layout>
-        </PrivateRoute>
+            </section>
+
+            {!blogsError && !blogCategoriesError && !usersError && (
+                <section>
+                    <UserBlogList
+                        initialBlogs={initialBlogs}
+                        initialBlogCategories={initialBlogCategories}
+                        initialUsers={initialUsers}
+                    />
+                </section>
+            )}
+        </UserLayout>
     );
 };
 

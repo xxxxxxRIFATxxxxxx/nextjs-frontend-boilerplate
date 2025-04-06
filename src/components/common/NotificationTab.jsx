@@ -94,6 +94,12 @@ const NotificationTab = () => {
         }
     };
 
+    // get the appropriate target url based on the logged-in user's role
+    const getTargetUrl = (notif) => {
+        if (!notif?.targetUrls || !user?.role) return "#";
+        return notif.targetUrls[user.role] || "#";
+    };
+
     return (
         <div className="relative" ref={dropdownRef}>
             {/* notification bell icon */}
@@ -152,14 +158,14 @@ const NotificationTab = () => {
                                         )}
 
                                         <Link
-                                            href={notif?.targetUrl}
+                                            href={getTargetUrl(notif)}
                                             className="font-medium"
                                         >
                                             {notif?.message}
                                         </Link>
 
                                         <Link
-                                            href={notif?.targetUrl}
+                                            href={getTargetUrl(notif)}
                                             className="text-xs text-gray-500"
                                         >
                                             {formatDateTime(notif?.createdAt)}
@@ -192,14 +198,14 @@ const NotificationTab = () => {
                                         )}
 
                                         <Link
-                                            href={notif?.targetUrl}
+                                            href={getTargetUrl(notif)}
                                             className="font-medium"
                                         >
                                             {notif?.message}
                                         </Link>
 
                                         <Link
-                                            href={notif?.targetUrl}
+                                            href={getTargetUrl(notif)}
                                             className="text-xs text-gray-500"
                                         >
                                             {formatDateTime(notif?.createdAt)}
@@ -242,14 +248,14 @@ const NotificationTab = () => {
                                                 )}
 
                                                 <Link
-                                                    href={notif?.targetUrl}
+                                                    href={getTargetUrl(notif)}
                                                     className="font-medium"
                                                 >
                                                     {notif?.message}
                                                 </Link>
 
                                                 <Link
-                                                    href={notif?.targetUrl}
+                                                    href={getTargetUrl(notif)}
                                                     className="text-xs text-gray-500"
                                                 >
                                                     {formatDateTime(

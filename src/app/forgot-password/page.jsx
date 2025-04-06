@@ -1,18 +1,18 @@
-import Layout from "@/components/common/Layout";
 import PublicRoute from "@/components/common/PublicRoute";
-import ForgotPasswordContent from "@/components/forgot-password/ForgotPasswordContent";
+import ForgotPasswordContent from "@/components/common/ForgotPasswordContent";
+import UserLayout from "@/components/user/UserLayout";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Forgot Password",
-    description: "Next JS Frontend Boilerplate",
+    title: `Forgot Password | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const ForgotPassword = () => {
     return (
         <PublicRoute>
-            <Layout>
+            <UserLayout>
                 <ForgotPasswordContent />
-            </Layout>
+            </UserLayout>
         </PublicRoute>
     );
 };

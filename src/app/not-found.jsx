@@ -1,10 +1,14 @@
-import Layout from "@/components/common/Layout";
+import Link from "next/link";
+import UserLayout from "@/components/user/UserLayout";
 
 const NotFound = () => {
     return (
-        <Layout>
-            <section>Not found</section>
-        </Layout>
+        <UserLayout>
+            <section>
+                <p>Not found</p>
+                <Link href="/">Go home</Link>
+            </section>
+        </UserLayout>
     );
 };
 

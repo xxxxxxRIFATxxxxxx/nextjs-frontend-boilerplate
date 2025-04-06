@@ -1,10 +1,10 @@
-import Layout from "@/components/common/Layout";
 import PrivateRoute from "@/components/common/PrivateRoute";
-import ProfileContent from "@/components/profile/ProfileContent";
+import ProfileContent from "@/components/common/ProfileContent";
+import UserLayout from "@/components/user/UserLayout";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Profile",
-    description: "Next JS Frontend Boilerplate",
+    title: `Profile | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const Profile = () => {
@@ -12,9 +12,9 @@ const Profile = () => {
         <PrivateRoute
             allowedRoles={["super_admin", "admin", "moderator", "user"]}
         >
-            <Layout>
+            <UserLayout>
                 <ProfileContent />
-            </Layout>
+            </UserLayout>
         </PrivateRoute>
     );
 };

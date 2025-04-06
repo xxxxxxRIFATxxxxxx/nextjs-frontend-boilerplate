@@ -168,11 +168,11 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const forgotPassword = async (email) => {
+    const forgotPassword = async (emailOrPhoneOrUsername) => {
         try {
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/users/forgot-password`,
-                { email }
+                { emailOrPhoneOrUsername }
             );
 
             return response?.data;

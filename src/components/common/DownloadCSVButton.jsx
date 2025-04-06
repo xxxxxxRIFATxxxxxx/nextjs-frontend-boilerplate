@@ -78,7 +78,7 @@ const DownloadCSVButton = ({
         URL.revokeObjectURL(url);
     };
 
-    return <button onClick={downloadCSV}>Download CSV</button>;
+    return <button onClick={downloadCSV}>Download csv</button>;
 };
 
 export default DownloadCSVButton;

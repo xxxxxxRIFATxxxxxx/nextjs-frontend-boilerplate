@@ -54,7 +54,7 @@ const FontSize = Extension.create({
 const TextEditor = ({ onChange, content = "" }) => {
     const editor = useEditor({
         extensions: [
-            StarterKit, // Includes Bold, Italic, Heading, BulletList, OrderedList, ListItem
+            StarterKit, // includes bold, italic, heading, bulletList, orderedList, listItem
             Underline,
             Link,
             Image,
@@ -65,7 +65,7 @@ const TextEditor = ({ onChange, content = "" }) => {
         onUpdate: ({ editor }) => {
             onChange(editor.getHTML());
         },
-        immediatelyRender: false, // Fix SSR hydration issue
+        immediatelyRender: false, // fix ssr hydration issue
     });
 
     if (!editor) return null;

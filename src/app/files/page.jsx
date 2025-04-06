@@ -1,26 +1,26 @@
-import Layout from "@/components/common/Layout";
 import PrivateRoute from "@/components/common/PrivateRoute";
 import Error from "@/components/common/Error";
-import FileList from "@/components/files/FileList";
+import UserLayout from "@/components/user/UserLayout";
+import UserFileList from "@/components/user/UserFileList";
 import fetchData from "@/helpers/fetchData";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Files",
-    description: "Next JS Frontend Boilerplate",
+    title: `Files | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const Files = async () => {
     const filesResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/files`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/files/active`
     );
 
-    // extract initial data or error messages
+    // extract data or error messages
     const initialFiles = filesResponse?.data || [];
     const filesError = filesResponse?.error || null;
 
     return (
         <PrivateRoute allowedRoles={["super_admin", "admin", "moderator"]}>
-            <Layout>
+            <UserLayout>
                 {/* error message */}
                 <section>
                     {filesError && (
@@ -34,10 +34,10 @@ const Files = async () => {
 
                 {!filesError && (
                     <section>
-                        <FileList initialFiles={initialFiles} />
+                        <UserFileList initialFiles={initialFiles} />
                     </section>
                 )}
-            </Layout>
+            </UserLayout>
         </PrivateRoute>
     );
 };

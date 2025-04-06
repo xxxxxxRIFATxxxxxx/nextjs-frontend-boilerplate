@@ -13,8 +13,8 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate",
-    description: "Next JS Frontend Boilerplate",
+    title: `Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 export default function RootLayout({ children }) {

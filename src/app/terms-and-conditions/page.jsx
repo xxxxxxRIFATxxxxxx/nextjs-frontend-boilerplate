@@ -1,17 +1,17 @@
-import Layout from "@/components/common/Layout";
+import UserLayout from "@/components/user/UserLayout";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Terms & Conditions",
-    description: "Next JS Frontend Boilerplate",
+    title: `Terms & Conditions | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const TermsAndConditions = async () => {
     return (
-        <Layout>
+        <UserLayout>
             <section>
-                <p>Terms & Conditions</p>
+                <p>Terms & conditions</p>
             </section>
-        </Layout>
+        </UserLayout>
     );
 };
 

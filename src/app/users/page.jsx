@@ -1,26 +1,26 @@
-import Layout from "@/components/common/Layout";
 import PrivateRoute from "@/components/common/PrivateRoute";
-import UserList from "@/components/users/UserList";
 import Error from "@/components/common/Error";
+import UserLayout from "@/components/user/UserLayout";
+import UserUserList from "@/components/user/UserUserList";
 import fetchData from "@/helpers/fetchData";
 
 export const metadata = {
-    title: "Next JS Frontend Boilerplate - Users",
-    description: "Next JS Frontend Boilerplate",
+    title: `Users | Next.js Frontend Boilerplate`,
+    description: `Next JS Frontend Boilerplate`,
 };
 
 const Users = async () => {
     const usersResponse = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/active`
     );
 
-    // extract initial data or error messages
+    // extract data or error messages
     const initialUsers = usersResponse?.data || [];
     const usersError = usersResponse?.error || null;
 
     return (
         <PrivateRoute allowedRoles={["super_admin", "admin", "moderator"]}>
-            <Layout>
+            <UserLayout>
                 {/* error message */}
                 <section>
                     {usersError && (
@@ -34,10 +34,10 @@ const Users = async () => {
 
                 {!usersError && (
                     <section>
-                        <UserList initialUsers={initialUsers} />
+                        <UserUserList initialUsers={initialUsers} />
                     </section>
                 )}
-            </Layout>
+            </UserLayout>
         </PrivateRoute>
     );
 };

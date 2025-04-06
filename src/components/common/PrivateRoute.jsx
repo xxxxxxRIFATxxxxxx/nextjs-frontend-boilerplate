@@ -1,8 +1,8 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthProvider";
 import FullPageSpinner from "@/components/common/FullPageSpinner";
+import { useAuth } from "@/context/AuthProvider";
 
 const PrivateRoute = ({ children, allowedRoles = [] }) => {
     const { user, loading } = useAuth();
