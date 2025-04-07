@@ -7,10 +7,10 @@ import fetchData from "@/helpers/fetchData";
 export const generateMetadata = async ({ params }) => {
     const { id } = await params;
 
+    // user
     const userResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`
     );
-
     const user = userResponse?.data || null;
     const userError = userResponse?.error || null;
 
@@ -30,10 +30,10 @@ export const generateMetadata = async ({ params }) => {
 const UserDetails = async ({ params }) => {
     const { id } = await params;
 
+    // user
     const userResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`
     );
-
     const initialUser = userResponse?.data || null;
     const userError = userResponse?.error || null;
 

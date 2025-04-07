@@ -21,12 +21,11 @@ const UserBlogCategoryList = ({ initialBlogCategories }) => {
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
+        // blog categories
         const updatedBlogCategoriesResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/active`
         );
-
         const updatedBlogCategories = updatedBlogCategoriesResponse?.data || [];
-
         const updatedBlogCategoriesError =
             updatedBlogCategoriesResponse?.error || null;
 

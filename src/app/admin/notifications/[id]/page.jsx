@@ -7,10 +7,10 @@ import fetchData from "@/helpers/fetchData";
 export const generateMetadata = async ({ params }) => {
     const { id } = await params;
 
+    // notification
     const notificationResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${id}`
     );
-
     const notification = notificationResponse?.data || null;
     const notificationError = notificationResponse?.error || null;
 
@@ -30,10 +30,10 @@ export const generateMetadata = async ({ params }) => {
 const NotificationDetails = async ({ params }) => {
     const { id } = await params;
 
+    // notification
     const notificationResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${id}`
     );
-
     const initialNotification = notificationResponse?.data || null;
     const notificationError = notificationResponse?.error || null;
 

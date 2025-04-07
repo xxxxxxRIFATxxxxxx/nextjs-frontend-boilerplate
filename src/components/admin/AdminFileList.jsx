@@ -82,12 +82,11 @@ const AdminFileList = ({ initialFiles }) => {
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
+        // files
         const updatedFilesResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/files`
         );
-
         const updatedFiles = updatedFilesResponse?.data || [];
-
         const updatedFilesError = updatedFilesResponse?.error || null;
 
         if (updatedFilesError) {

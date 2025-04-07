@@ -56,18 +56,19 @@ const AdminNotificationList = ({ initialNotifications, initialUsers }) => {
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
+        // notifications
         const updatedNotificationsResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/notifications`
         );
+        const updatedNotifications = updatedNotificationsResponse?.data || [];
+        const updatedNotificationsError =
+            updatedNotificationsResponse?.error || null;
+
+        // users
         const updatedUsersResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/users`
         );
-
-        const updatedNotifications = updatedNotificationsResponse?.data || [];
         const updatedUsers = updatedUsersResponse?.data || [];
-
-        const updatedNotificationsError =
-            updatedNotificationsResponse?.error || null;
         const updatedUsersError = updatedUsersResponse?.error || null;
 
         if (updatedNotificationsError || updatedUsersError) {

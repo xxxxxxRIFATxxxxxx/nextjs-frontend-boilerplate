@@ -7,10 +7,10 @@ import fetchData from "@/helpers/fetchData";
 export const generateMetadata = async ({ params }) => {
     const { id } = await params;
 
+    // file
     const fileResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/files/active/${id}`
     );
-
     const file = fileResponse?.data || null;
     const fileError = fileResponse?.error || null;
 
@@ -30,10 +30,10 @@ export const generateMetadata = async ({ params }) => {
 const FileDetails = async ({ params }) => {
     const { id } = await params;
 
+    // file
     const fileResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/files/active/${id}`
     );
-
     const initialFile = fileResponse?.data || null;
     const fileError = fileResponse?.error || null;
 

@@ -16,10 +16,10 @@ const UserUserDetailsContent = ({ initialUser, id }) => {
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
+        // user
         const updatedUserResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/users/active/${id}`
         );
-
         const updatedUser = updatedUserResponse?.data || null;
         const updatedUserError = updatedUserResponse?.error || null;
 

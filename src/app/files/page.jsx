@@ -10,11 +10,10 @@ export const metadata = {
 };
 
 const Files = async () => {
+    // files
     const filesResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/files/active`
     );
-
-    // extract data or error messages
     const initialFiles = filesResponse?.data || [];
     const filesError = filesResponse?.error || null;
 

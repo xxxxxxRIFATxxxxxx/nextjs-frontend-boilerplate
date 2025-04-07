@@ -10,11 +10,10 @@ export const metadata = {
 };
 
 const Notifications = async () => {
+    // notifications
     const notificationsResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/active`
     );
-
-    // extract data or error messages
     const initialNotifications = notificationsResponse?.data || [];
     const notificationsError = notificationsResponse?.error || null;
 

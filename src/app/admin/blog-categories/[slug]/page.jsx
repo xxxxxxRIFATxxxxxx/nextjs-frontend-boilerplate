@@ -7,10 +7,10 @@ import fetchData from "@/helpers/fetchData";
 export const generateMetadata = async ({ params }) => {
     const { slug } = await params;
 
+    // blog category
     const blogCategoryResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/slug/${slug}`
     );
-
     const blogCategory = blogCategoryResponse?.data || null;
     const blogCategoryError = blogCategoryResponse?.error || null;
 
@@ -30,10 +30,10 @@ export const generateMetadata = async ({ params }) => {
 const BlogCategoryDetails = async ({ params }) => {
     const { slug } = await params;
 
+    // blog category
     const blogCategoryResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/slug/${slug}`
     );
-
     const initialBlogCategory = blogCategoryResponse?.data || null;
     const blogCategoryError = blogCategoryResponse?.error || null;
 

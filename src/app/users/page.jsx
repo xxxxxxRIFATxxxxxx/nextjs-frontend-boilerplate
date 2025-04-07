@@ -10,11 +10,10 @@ export const metadata = {
 };
 
 const Users = async () => {
+    // users
     const usersResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/active`
     );
-
-    // extract data or error messages
     const initialUsers = usersResponse?.data || [];
     const usersError = usersResponse?.error || null;
 

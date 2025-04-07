@@ -9,11 +9,10 @@ export const metadata = {
 };
 
 const BlogCategories = async () => {
+    // blog categories
     const blogCategoriesResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/active`
     );
-
-    // extract data or error messages
     const initialBlogCategories = blogCategoriesResponse?.data || [];
     const blogCategoriesError = blogCategoriesResponse?.error || null;
 

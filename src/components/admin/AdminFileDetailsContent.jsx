@@ -13,10 +13,10 @@ const AdminFileDetailsContent = ({ initialFile, id }) => {
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
+        // file
         const updatedFileResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/files/${id}`
         );
-
         const updatedFile = updatedFileResponse?.data || null;
         const updatedFileError = updatedFileResponse?.error || null;
 

@@ -10,25 +10,25 @@ export const metadata = {
 };
 
 const Blogs = async () => {
+    // blogs
     const blogsResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`
     );
+    const initialBlogs = blogsResponse?.data || [];
+    const blogsError = blogsResponse?.error || null;
 
+    // blog categories
     const blogCategoriesResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
     );
+    const initialBlogCategories = blogCategoriesResponse?.data || [];
+    const blogCategoriesError = blogCategoriesResponse?.error || null;
 
+    // users
     const usersResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users`
     );
-
-    // extract initial data or error messages
-    const initialBlogs = blogsResponse?.data || [];
-    const initialBlogCategories = blogCategoriesResponse?.data || [];
     const initialUsers = usersResponse?.data || [];
-
-    const blogsError = blogsResponse?.error || null;
-    const blogCategoriesError = blogCategoriesResponse?.error || null;
     const usersError = usersResponse?.error || null;
 
     return (

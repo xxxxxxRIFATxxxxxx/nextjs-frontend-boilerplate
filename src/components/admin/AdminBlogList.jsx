@@ -65,25 +65,26 @@ const AdminBlogList = ({
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
+        // blogs
         const updatedBlogsResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`
         );
+        const updatedBlogs = updatedBlogsResponse?.data || [];
+        const updatedBlogsError = updatedBlogsResponse?.error || null;
 
+        // blog categories
         const updatedBlogCategoriesResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories`
         );
+        const updatedBlogCategories = updatedBlogCategoriesResponse?.data || [];
+        const updatedBlogCategoriesError =
+            updatedBlogCategoriesResponse?.error || null;
 
+        // users
         const updatedUsersResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/users`
         );
-
-        const updatedBlogs = updatedBlogsResponse?.data || [];
-        const updatedBlogCategories = updatedBlogCategoriesResponse?.data || [];
         const updatedUsers = updatedUsersResponse?.data || [];
-
-        const updatedBlogsError = updatedBlogsResponse?.error || null;
-        const updatedBlogCategoriesError =
-            updatedBlogCategoriesResponse?.error || null;
         const updatedUsersError = updatedUsersResponse?.error || null;
 
         if (

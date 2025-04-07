@@ -10,19 +10,18 @@ export const metadata = {
 };
 
 const Notifications = async () => {
+    // notifications
     const notificationsResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/notifications`
     );
+    const initialNotifications = notificationsResponse?.data || [];
+    const notificationsError = notificationsResponse?.error || null;
 
+    // users
     const usersResponse = await fetchData(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users`
     );
-
-    // extract initial data or error messages
-    const initialNotifications = notificationsResponse?.data || [];
     const initialUsers = usersResponse?.data || [];
-
-    const notificationsError = notificationsResponse?.error || null;
     const usersError = usersResponse?.error || null;
 
     return (

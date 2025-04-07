@@ -13,10 +13,10 @@ const AdminNotificationDetailsContent = ({ initialNotification, id }) => {
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
+        // notification
         const updatedNotificationResponse = await fetchDataForClient(
             `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${id}`
         );
-
         const updatedNotification = updatedNotificationResponse?.data || null;
         const updatedNotificationError =
             updatedNotificationResponse?.error || null;
