@@ -14,6 +14,7 @@ import Spinner from "@/components/common/Spinner";
 import RoleBasedComponent from "@/components/common/RoleBasedComponent";
 import DefaultUserIcon from "@/components/common/DefaultUserIcon";
 import { useSocket } from "@/context/SocketProvider";
+import { useAuth } from "@/context/AuthProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import formatDate from "@/helpers/formatDate";
 import uploadSingleFile from "@/helpers/uploadSingleFile";
@@ -22,6 +23,7 @@ import fetchDataForClient from "@/helpers/fetchDataForClient";
 const AdminUserList = ({ initialUsers }) => {
     const router = useRouter();
     const socket = useSocket();
+    const { user } = useAuth();
 
     const [users, setUsers] = useState(initialUsers);
 
@@ -617,141 +619,326 @@ const AdminUserList = ({ initialUsers }) => {
                                 </td>
                             </tr>
                         ) : (
-                            filteredItems.map((item, index) => (
-                                <tr key={item?._id}>
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            name={`select${index}`}
-                                            id={`select${index}`}
-                                            className=""
-                                            checked={selectedItems.includes(
-                                                item?._id
-                                            )}
-                                            onChange={() =>
-                                                handleSelectItem(item?._id)
-                                            }
-                                        />
-                                    </td>
+                            filteredItems.map((item, index) => {
+                                // for logged-in user data only
+                                if (item?._id === user?._id) {
+                                    return (
+                                        <tr key={user?._id}>
+                                            <td>
+                                                <input
+                                                    type="checkbox"
+                                                    name={`select${index}`}
+                                                    id={`select${index}`}
+                                                    className=""
+                                                    checked={selectedItems.includes(
+                                                        item?._id
+                                                    )}
+                                                    onChange={() =>
+                                                        handleSelectItem(
+                                                            item?._id
+                                                        )
+                                                    }
+                                                />
+                                            </td>
 
-                                    <td>{index + 1}</td>
+                                            <td>{index + 1}</td>
 
-                                    <td>
-                                        {item?.image ? (
-                                            <Image
-                                                src={item?.image}
-                                                className="w-[200px] h-[200px] object-cover rounded-full"
-                                                width={200}
-                                                height={200}
-                                                alt="user image"
-                                                priority
-                                            />
-                                        ) : (
-                                            <DefaultUserIcon
-                                                width="w-[200px]"
-                                                height="h-[200px]"
-                                                iconSize={100}
-                                            />
-                                        )}
-                                    </td>
-
-                                    <td>
-                                        <span
-                                            className="hover:underline cursor-pointer"
-                                            onClick={() =>
-                                                goToItemDetails(item)
-                                            }
-                                        >
-                                            {item?._id}
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span
-                                            className="hover:underline cursor-pointer"
-                                            onClick={() =>
-                                                goToItemDetails(item)
-                                            }
-                                        >
-                                            {item?.fullName}
-                                        </span>
-                                    </td>
-
-                                    <td>{item?.email}</td>
-
-                                    <td>{item?.phone}</td>
-
-                                    <td>{item?.username}</td>
-
-                                    <td>{item?.role}</td>
-
-                                    <td>
-                                        {item?.dateOfBirth ? (
-                                            <span>
-                                                {formatDate(item?.dateOfBirth)}
-                                            </span>
-                                        ) : (
-                                            <span>-</span>
-                                        )}
-                                    </td>
-
-                                    <td>
-                                        {item?.lastLogin ? (
-                                            <span>
-                                                {formatDateTime(
-                                                    item?.lastLogin
+                                            <td>
+                                                {user?.image ? (
+                                                    <Image
+                                                        src={user?.image}
+                                                        className="w-[200px] h-[200px] object-cover rounded-full"
+                                                        width={200}
+                                                        height={200}
+                                                        alt="user image"
+                                                        priority
+                                                    />
+                                                ) : (
+                                                    <DefaultUserIcon
+                                                        width="w-[200px]"
+                                                        height="h-[200px]"
+                                                        iconSize={100}
+                                                    />
                                                 )}
-                                            </span>
-                                        ) : (
-                                            <span>-</span>
-                                        )}
-                                    </td>
+                                            </td>
 
-                                    <td>{item?.status}</td>
+                                            <td>
+                                                <span
+                                                    className="hover:underline cursor-pointer"
+                                                    onClick={() =>
+                                                        goToItemDetails(user)
+                                                    }
+                                                >
+                                                    {user?._id}
+                                                </span>
+                                            </td>
 
-                                    <td>{formatDateTime(item?.createdAt)}</td>
+                                            <td>
+                                                <span
+                                                    className="hover:underline cursor-pointer"
+                                                    onClick={() =>
+                                                        goToItemDetails(user)
+                                                    }
+                                                >
+                                                    {user?.fullName}
+                                                </span>
+                                            </td>
 
-                                    <td>{formatDateTime(item?.updatedAt)}</td>
+                                            <td>{user?.email}</td>
 
-                                    <td className="p-[18px] relative">
-                                        <RoleBasedComponent
-                                            allowedRoles={["super_admin"]}
-                                        >
-                                            <button
-                                                type="button"
-                                                className="cursor-pointer"
-                                                onClick={() =>
-                                                    openAddOrEditModal(item)
-                                                }
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                        </RoleBasedComponent>
+                                            <td>{user?.phone}</td>
 
-                                        <button
-                                            type="button"
-                                            className="cursor-pointer"
-                                            onClick={() => openViewModal(item)}
-                                        >
-                                            <Eye className="w-4 h-4" />
-                                        </button>
+                                            <td>{user?.username}</td>
 
-                                        <RoleBasedComponent
-                                            allowedRoles={["super_admin"]}
-                                        >
-                                            <button
-                                                type="button"
-                                                className="cursor-pointer"
-                                                onClick={() =>
-                                                    openDeleteModal(item)
-                                                }
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </RoleBasedComponent>
-                                    </td>
-                                </tr>
-                            ))
+                                            <td>{user?.role}</td>
+
+                                            <td>
+                                                {user?.dateOfBirth ? (
+                                                    <span>
+                                                        {formatDate(
+                                                            user?.dateOfBirth
+                                                        )}
+                                                    </span>
+                                                ) : (
+                                                    <span>-</span>
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                {user?.lastLogin ? (
+                                                    <span>
+                                                        {formatDateTime(
+                                                            user?.lastLogin
+                                                        )}
+                                                    </span>
+                                                ) : (
+                                                    <span>-</span>
+                                                )}
+                                            </td>
+
+                                            <td>{user?.status}</td>
+
+                                            <td>
+                                                {formatDateTime(
+                                                    user?.createdAt
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                {formatDateTime(
+                                                    user?.updatedAt
+                                                )}
+                                            </td>
+
+                                            <td className="p-[18px] relative">
+                                                <RoleBasedComponent
+                                                    allowedRoles={[
+                                                        "super_admin",
+                                                    ]}
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        className="cursor-pointer"
+                                                        onClick={() =>
+                                                            openAddOrEditModal(
+                                                                user
+                                                            )
+                                                        }
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                </RoleBasedComponent>
+
+                                                <button
+                                                    type="button"
+                                                    className="cursor-pointer"
+                                                    onClick={() =>
+                                                        openViewModal(user)
+                                                    }
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+
+                                                <RoleBasedComponent
+                                                    allowedRoles={[
+                                                        "super_admin",
+                                                    ]}
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        className="cursor-pointer"
+                                                        onClick={() =>
+                                                            openDeleteModal(
+                                                                user
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </RoleBasedComponent>
+                                            </td>
+                                        </tr>
+                                    );
+                                } else {
+                                    return (
+                                        <tr key={item?._id}>
+                                            <td>
+                                                <input
+                                                    type="checkbox"
+                                                    name={`select${index}`}
+                                                    id={`select${index}`}
+                                                    className=""
+                                                    checked={selectedItems.includes(
+                                                        item?._id
+                                                    )}
+                                                    onChange={() =>
+                                                        handleSelectItem(
+                                                            item?._id
+                                                        )
+                                                    }
+                                                />
+                                            </td>
+
+                                            <td>{index + 1}</td>
+
+                                            <td>
+                                                {item?.image ? (
+                                                    <Image
+                                                        src={item?.image}
+                                                        className="w-[200px] h-[200px] object-cover rounded-full"
+                                                        width={200}
+                                                        height={200}
+                                                        alt="user image"
+                                                        priority
+                                                    />
+                                                ) : (
+                                                    <DefaultUserIcon
+                                                        width="w-[200px]"
+                                                        height="h-[200px]"
+                                                        iconSize={100}
+                                                    />
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                <span
+                                                    className="hover:underline cursor-pointer"
+                                                    onClick={() =>
+                                                        goToItemDetails(item)
+                                                    }
+                                                >
+                                                    {item?._id}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <span
+                                                    className="hover:underline cursor-pointer"
+                                                    onClick={() =>
+                                                        goToItemDetails(item)
+                                                    }
+                                                >
+                                                    {item?.fullName}
+                                                </span>
+                                            </td>
+
+                                            <td>{item?.email}</td>
+
+                                            <td>{item?.phone}</td>
+
+                                            <td>{item?.username}</td>
+
+                                            <td>{item?.role}</td>
+
+                                            <td>
+                                                {item?.dateOfBirth ? (
+                                                    <span>
+                                                        {formatDate(
+                                                            item?.dateOfBirth
+                                                        )}
+                                                    </span>
+                                                ) : (
+                                                    <span>-</span>
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                {item?.lastLogin ? (
+                                                    <span>
+                                                        {formatDateTime(
+                                                            item?.lastLogin
+                                                        )}
+                                                    </span>
+                                                ) : (
+                                                    <span>-</span>
+                                                )}
+                                            </td>
+
+                                            <td>{item?.status}</td>
+
+                                            <td>
+                                                {formatDateTime(
+                                                    item?.createdAt
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                {formatDateTime(
+                                                    item?.updatedAt
+                                                )}
+                                            </td>
+
+                                            <td className="p-[18px] relative">
+                                                <RoleBasedComponent
+                                                    allowedRoles={[
+                                                        "super_admin",
+                                                    ]}
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        className="cursor-pointer"
+                                                        onClick={() =>
+                                                            openAddOrEditModal(
+                                                                item
+                                                            )
+                                                        }
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                </RoleBasedComponent>
+
+                                                <button
+                                                    type="button"
+                                                    className="cursor-pointer"
+                                                    onClick={() =>
+                                                        openViewModal(item)
+                                                    }
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+
+                                                <RoleBasedComponent
+                                                    allowedRoles={[
+                                                        "super_admin",
+                                                    ]}
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        className="cursor-pointer"
+                                                        onClick={() =>
+                                                            openDeleteModal(
+                                                                item
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </RoleBasedComponent>
+                                            </td>
+                                        </tr>
+                                    );
+                                }
+                            })
                         )}
                     </tbody>
                 </table>
