@@ -1,16 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 import Select from "react-select";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const UserNotificationList = ({ initialNotifications, initialUsers }) => {
     const router = useRouter();
+    const socket = useSocket();
 
     const [notifications, setNotifications] = useState(initialNotifications);
     const [users, setUsers] = useState(initialUsers);
@@ -109,6 +108,8 @@ const UserNotificationList = ({ initialNotifications, initialUsers }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("notificationsUpdated", refreshData);
         socket.on("usersUpdated", refreshData);
 
@@ -116,7 +117,7 @@ const UserNotificationList = ({ initialNotifications, initialUsers }) => {
             socket.off("notificationsUpdated", refreshData);
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

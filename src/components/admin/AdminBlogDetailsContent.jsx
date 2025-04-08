@@ -2,14 +2,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const AdminBlogDetailsContent = ({ initialBlog, slug }) => {
+    const socket = useSocket();
+
     const [blog, setBlog] = useState(initialBlog);
 
     // fetch updated data when the server sends a real-time update
@@ -30,6 +30,8 @@ const AdminBlogDetailsContent = ({ initialBlog, slug }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("blogsUpdated", refreshData);
         socket.on("blogcategoriesUpdated", refreshData);
         socket.on("usersUpdated", refreshData);
@@ -39,7 +41,7 @@ const AdminBlogDetailsContent = ({ initialBlog, slug }) => {
             socket.off("blogcategoriesUpdated", refreshData);
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

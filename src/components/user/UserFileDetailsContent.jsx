@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const UserFileDetailsContent = ({ initialFile, id }) => {
+    const socket = useSocket();
+
     const [file, setFile] = useState(initialFile);
 
     // fetch updated data when the server sends a real-time update
@@ -29,12 +29,14 @@ const UserFileDetailsContent = ({ initialFile, id }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("filesUpdated", refreshData);
 
         return () => {
             socket.off("filesUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

@@ -1,16 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 import Select from "react-select";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const UserFileList = ({ initialFiles }) => {
     const router = useRouter();
+    const socket = useSocket();
 
     const [files, setFiles] = useState(initialFiles);
 
@@ -90,11 +89,14 @@ const UserFileList = ({ initialFiles }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("filesUpdated", refreshData);
+
         return () => {
             socket.off("filesUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

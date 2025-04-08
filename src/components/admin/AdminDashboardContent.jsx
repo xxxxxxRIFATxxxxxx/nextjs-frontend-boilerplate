@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import { useSocket } from "@/context/SocketProvider";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
-
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
 const AdminDashboardContent = ({
     initialUsers,
@@ -13,6 +11,8 @@ const AdminDashboardContent = ({
     initialFiles,
     initialNotifications,
 }) => {
+    const socket = useSocket();
+
     const [users, setUsers] = useState(initialUsers);
     const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
     const [blogs, setBlogs] = useState(initialBlogs);
@@ -87,6 +87,8 @@ const AdminDashboardContent = ({
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("usersUpdated", refreshData);
         socket.on("blogcategoriesUpdated", refreshData);
         socket.on("blogsUpdated", refreshData);
@@ -100,7 +102,7 @@ const AdminDashboardContent = ({
             socket.off("filesUpdated", refreshData);
             socket.off("notificationsUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

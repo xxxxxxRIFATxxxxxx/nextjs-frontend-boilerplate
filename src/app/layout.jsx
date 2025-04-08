@@ -2,6 +2,7 @@ import { Poppins } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Maintenance from "@/components/common/Maintenance";
+import { SocketProvider } from "@/context/SocketProvider";
 import { AuthProvider } from "@/context/AuthProvider";
 import { NotificationProvider } from "@/context/NotificationProvider";
 import "@/styles/globals.css";
@@ -40,9 +41,13 @@ export default function RootLayout({ children }) {
                 {isMaintenanceMode ? (
                     <Maintenance />
                 ) : (
-                    <AuthProvider>
-                        <NotificationProvider>{children}</NotificationProvider>
-                    </AuthProvider>
+                    <SocketProvider>
+                        <AuthProvider>
+                            <NotificationProvider>
+                                {children}
+                            </NotificationProvider>
+                        </AuthProvider>
+                    </SocketProvider>
                 )}
             </body>
         </html>

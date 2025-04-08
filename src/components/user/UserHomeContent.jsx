@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import { useSocket } from "@/context/SocketProvider";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const UserHomeContent = ({ initialBlogCategories, initialBlogs }) => {
+    const socket = useSocket();
+
     const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
     const [blogs, setBlogs] = useState(initialBlogs);
 
@@ -41,6 +41,8 @@ const UserHomeContent = ({ initialBlogCategories, initialBlogs }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("usersUpdated", refreshData);
         socket.on("blogcategoriesUpdated", refreshData);
         socket.on("blogsUpdated", refreshData);
@@ -50,7 +52,7 @@ const UserHomeContent = ({ initialBlogCategories, initialBlogs }) => {
             socket.off("blogcategoriesUpdated", refreshData);
             socket.off("blogsUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

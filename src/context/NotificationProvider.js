@@ -1,31 +1,31 @@
 "use client";
 import { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { io } from "socket.io-client";
-import getAuthHeaders from "@/helpers/getAuthHeaders";
+import { useSocket } from "@/context/SocketProvider";
 import { useAuth } from "@/context/AuthProvider";
+import getAuthHeaders from "@/helpers/getAuthHeaders";
 
 const NotificationContext = createContext(null);
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
 export const NotificationProvider = ({ children }) => {
+    const socket = useSocket();
     const { user } = useAuth();
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user) {
-            fetchNotifications();
+        if (!user || !socket) return;
 
-            socket.on("notificationsUpdated", async () => {
-                await fetchNotifications();
-            });
-        }
+        fetchNotifications();
+
+        socket.on("notificationsUpdated", async () => {
+            await fetchNotifications();
+        });
 
         return () => {
             socket.off("notificationsUpdated");
         };
-    }, [user]);
+    }, [user, socket]);
 
     const fetchNotifications = async () => {
         if (!user) return;

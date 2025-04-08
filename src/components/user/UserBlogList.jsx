@@ -3,12 +3,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { io } from "socket.io-client";
 import Select from "react-select";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
-
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
 const UserBlogList = ({
     initialBlogs,
@@ -16,6 +14,7 @@ const UserBlogList = ({
     initialUsers,
 }) => {
     const router = useRouter();
+    const socket = useSocket();
 
     const [blogs, setBlogs] = useState(initialBlogs);
     const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
@@ -161,6 +160,8 @@ const UserBlogList = ({
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("blogsUpdated", refreshData);
         socket.on("blogcategoriesUpdated", refreshData);
         socket.on("usersUpdated", refreshData);
@@ -170,7 +171,7 @@ const UserBlogList = ({
             socket.off("blogcategoriesUpdated", refreshData);
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

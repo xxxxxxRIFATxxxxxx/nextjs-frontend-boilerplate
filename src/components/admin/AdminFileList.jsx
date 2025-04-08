@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { io } from "socket.io-client";
 import { Edit, Eye, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -12,16 +11,16 @@ import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
 import RoleBasedComponent from "@/components/common/RoleBasedComponent";
 import DefaultFile from "@/components/common/DefaultFile";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import uploadMultipleFiles from "@/helpers/uploadMultipleFiles";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 import downloadAllFiles from "@/helpers/downloadAllFiles";
 import deleteAllFiles from "@/helpers/deleteAllFiles";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const AdminFileList = ({ initialFiles }) => {
     const router = useRouter();
+    const socket = useSocket();
 
     const [files, setFiles] = useState(initialFiles);
 
@@ -368,11 +367,14 @@ const AdminFileList = ({ initialFiles }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("filesUpdated", refreshData);
+
         return () => {
             socket.off("filesUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

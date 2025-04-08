@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { io } from "socket.io-client";
 import { Edit, Eye, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -13,12 +12,11 @@ import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
 import RoleBasedComponent from "@/components/common/RoleBasedComponent";
 import DefaultFile from "@/components/common/DefaultFile";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import uploadSingleFile from "@/helpers/uploadSingleFile";
 import uploadMultipleFiles from "@/helpers/uploadMultipleFiles";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
-
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
 const AdminBlogList = ({
     initialBlogs,
@@ -26,6 +24,7 @@ const AdminBlogList = ({
     initialUsers,
 }) => {
     const router = useRouter();
+    const socket = useSocket();
 
     const [blogs, setBlogs] = useState(initialBlogs);
     const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
@@ -494,6 +493,8 @@ const AdminBlogList = ({
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("blogsUpdated", refreshData);
         socket.on("blogcategoriesUpdated", refreshData);
         socket.on("usersUpdated", refreshData);
@@ -503,7 +504,7 @@ const AdminBlogList = ({
             socket.off("blogcategoriesUpdated", refreshData);
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

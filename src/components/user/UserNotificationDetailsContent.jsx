@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const UserNotificationDetailsContent = ({ initialNotification, id }) => {
+    const socket = useSocket();
+
     const [notification, setNotification] = useState(initialNotification);
 
     // fetch updated data when the server sends a real-time update
@@ -30,6 +30,8 @@ const UserNotificationDetailsContent = ({ initialNotification, id }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("notificationsUpdated", refreshData);
         socket.on("usersUpdated", refreshData);
 
@@ -37,7 +39,7 @@ const UserNotificationDetailsContent = ({ initialNotification, id }) => {
             socket.off("notificationsUpdated", refreshData);
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

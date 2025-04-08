@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { io } from "socket.io-client";
 import { Edit, Eye, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -10,13 +9,13 @@ import Modal from "@/components/common/Modal";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
 import RoleBasedComponent from "@/components/common/RoleBasedComponent";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const AdminBlogCategoryList = ({ initialBlogCategories }) => {
     const router = useRouter();
+    const socket = useSocket();
 
     const [blogCategories, setBlogCategories] = useState(initialBlogCategories);
 
@@ -287,12 +286,14 @@ const AdminBlogCategoryList = ({ initialBlogCategories }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("blogcategoriesUpdated", refreshData);
 
         return () => {
             socket.off("blogcategoriesUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

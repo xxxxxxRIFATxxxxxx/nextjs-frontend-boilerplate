@@ -13,18 +13,15 @@ import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
 import RoleBasedComponent from "@/components/common/RoleBasedComponent";
 import DefaultUserIcon from "@/components/common/DefaultUserIcon";
-import { useAuth } from "@/context/AuthProvider";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import formatDate from "@/helpers/formatDate";
 import uploadSingleFile from "@/helpers/uploadSingleFile";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const AdminUserList = ({ initialUsers }) => {
     const router = useRouter();
-
-    const { user, logout } = useAuth();
+    const socket = useSocket();
 
     const [users, setUsers] = useState(initialUsers);
 
@@ -197,11 +194,6 @@ const AdminUserList = ({ initialUsers }) => {
                 );
 
                 toast.success(response?.message);
-
-                // 🔁 refresh page if it's the logged-in user temporary solution
-                if (updatedItem?._id === user?._id) {
-                    window.location.reload();
-                }
 
                 closeAddOrEditModal();
             } else {
@@ -381,12 +373,14 @@ const AdminUserList = ({ initialUsers }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("usersUpdated", refreshData);
 
         return () => {
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

@@ -2,17 +2,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import DefaultUserIcon from "@/components/common/DefaultUserIcon";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const UserUserList = ({ initialUsers }) => {
     const router = useRouter();
+    const socket = useSocket();
 
     const [users, setUsers] = useState(initialUsers);
 
@@ -98,12 +97,14 @@ const UserUserList = ({ initialUsers }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("usersUpdated", refreshData);
 
         return () => {
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

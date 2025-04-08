@@ -2,16 +2,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 import DefaultUserIcon from "@/components/common/DefaultUserIcon";
+import { useSocket } from "@/context/SocketProvider";
 import formatDate from "@/helpers/formatDate";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const AdminUserDetailsContent = ({ initialUser, id }) => {
+    const socket = useSocket();
+
     const [user, setUser] = useState(initialUser);
 
     // fetch updated data when the server sends a real-time update
@@ -32,12 +32,14 @@ const AdminUserDetailsContent = ({ initialUser, id }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("usersUpdated", refreshData);
 
         return () => {
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

@@ -1,21 +1,21 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const AdminBlogCategoryDetailsContent = ({ initialBlogCategory, slug }) => {
+    const socket = useSocket();
+
     const [blogCategory, setBlogCategory] = useState(initialBlogCategory);
 
     // fetch updated data when the server sends a real-time update
     const refreshData = async () => {
         // blog category
         const updatedBlogCategoryResponse = await fetchDataForClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/blog-categories/slug/${slug}`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/blogCategories/slug/${slug}`
         );
         const updatedBlogCategory = updatedBlogCategoryResponse?.data || null;
         const updatedBlogCategoryError =
@@ -24,18 +24,20 @@ const AdminBlogCategoryDetailsContent = ({ initialBlogCategory, slug }) => {
         if (updatedBlogCategoryError) {
             toast.error(updatedBlogCategoryError);
         } else {
-            setBlog(updatedBlogCategory);
+            setBlogCategory(updatedBlogCategory);
         }
     };
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("blogcategoriesUpdated", refreshData);
 
         return () => {
             socket.off("blogcategoriesUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>

@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { io } from "socket.io-client";
 import { Edit, Eye, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -11,13 +10,13 @@ import Modal from "@/components/common/Modal";
 import DownloadCSVButton from "@/components/common/DownloadCSVButton";
 import Spinner from "@/components/common/Spinner";
 import RoleBasedComponent from "@/components/common/RoleBasedComponent";
+import { useSocket } from "@/context/SocketProvider";
 import formatDateTime from "@/helpers/formatDateTime";
 import fetchDataForClient from "@/helpers/fetchDataForClient";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
-
 const AdminNotificationList = ({ initialNotifications, initialUsers }) => {
     const router = useRouter();
+    const socket = useSocket();
 
     const [notifications, setNotifications] = useState(initialNotifications);
     const [users, setUsers] = useState(initialUsers);
@@ -362,6 +361,8 @@ const AdminNotificationList = ({ initialNotifications, initialUsers }) => {
 
     // listen for real-time events and update ui
     useEffect(() => {
+        if (!socket) return;
+
         socket.on("notificationsUpdated", refreshData);
         socket.on("usersUpdated", refreshData);
 
@@ -369,7 +370,7 @@ const AdminNotificationList = ({ initialNotifications, initialUsers }) => {
             socket.off("notificationsUpdated", refreshData);
             socket.off("usersUpdated", refreshData);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <div>
