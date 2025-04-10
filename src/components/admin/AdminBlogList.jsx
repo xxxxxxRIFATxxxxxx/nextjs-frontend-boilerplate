@@ -228,12 +228,6 @@ const AdminBlogList = ({
                         item?._id === selectedItem?._id
                             ? {
                                   ...updatedItem,
-                                  category: blogCategories.find(
-                                      (blogCat) => blogCat?._id === category
-                                  ),
-                                  createdBy: users.find(
-                                      (user) => user?._id === createdBy
-                                  ),
                               }
                             : item
                     )
@@ -262,12 +256,6 @@ const AdminBlogList = ({
                     ...prev,
                     {
                         ...newItem,
-                        category: blogCategories.find(
-                            (blogCat) => blogCat?._id === category
-                        ),
-                        createdBy: users.find(
-                            (user) => user?._id === createdBy
-                        ),
                     },
                 ]);
 
