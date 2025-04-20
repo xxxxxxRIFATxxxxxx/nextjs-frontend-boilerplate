@@ -459,7 +459,7 @@ const AdminBlogList = ({
                 : null
         );
 
-        setImages(selectedItem?.images);
+        setImages(selectedItem?.images || []);
 
         setCreatedBy(
             users.find((user) => user?._id === selectedItem?.createdBy?._id)

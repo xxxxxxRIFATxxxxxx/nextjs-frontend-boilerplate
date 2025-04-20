@@ -356,7 +356,7 @@ const AdminFileList = ({ initialFiles }) => {
 
     // update state when selectedItem changes
     useEffect(() => {
-        setMultipleFiles(selectedItem?.files);
+        setMultipleFiles(selectedItem?.files || []);
 
         setStatus(
             statusOptions.find(
