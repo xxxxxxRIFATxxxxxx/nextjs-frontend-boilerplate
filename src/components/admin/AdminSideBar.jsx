@@ -7,7 +7,7 @@ const AdminSideBar = () => {
     const { user, logout } = useAuth();
 
     return (
-        <header>
+        <aside>
             <div className="bg-gray-100 p-4 space-y-4 flex flex-col">
                 <Link href="/">Home</Link>
 
@@ -39,7 +39,7 @@ const AdminSideBar = () => {
                     <Link href="/login">Login</Link>
                 )}
             </div>
-        </header>
+        </aside>
     );
 };
 

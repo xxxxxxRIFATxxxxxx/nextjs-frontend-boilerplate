@@ -52,12 +52,10 @@ const NotificationDetails = async ({ params }) => {
                 </section>
 
                 {!notificationError && (
-                    <section>
-                        <AdminNotificationDetailsContent
-                            initialNotification={initialNotification}
-                            id={id}
-                        />
-                    </section>
+                    <AdminNotificationDetailsContent
+                        initialNotification={initialNotification}
+                        id={id}
+                    />
                 )}
             </AdminLayout>
         </PrivateRoute>

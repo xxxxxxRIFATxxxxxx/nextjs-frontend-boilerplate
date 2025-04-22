@@ -52,12 +52,10 @@ const BlogCategoryDetails = async ({ params }) => {
                 </section>
 
                 {!blogCategoryError && (
-                    <section>
-                        <AdminBlogCategoryDetailsContent
-                            initialBlogCategory={initialBlogCategory}
-                            slug={slug}
-                        />
-                    </section>
+                    <AdminBlogCategoryDetailsContent
+                        initialBlogCategory={initialBlogCategory}
+                        slug={slug}
+                    />
                 )}
             </AdminLayout>
         </PrivateRoute>

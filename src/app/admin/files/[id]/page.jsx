@@ -52,12 +52,10 @@ const FileDetails = async ({ params }) => {
                 </section>
 
                 {!fileError && (
-                    <section>
-                        <AdminFileDetailsContent
-                            initialFile={initialFile}
-                            id={id}
-                        />
-                    </section>
+                    <AdminFileDetailsContent
+                        initialFile={initialFile}
+                        id={id}
+                    />
                 )}
             </AdminLayout>
         </PrivateRoute>

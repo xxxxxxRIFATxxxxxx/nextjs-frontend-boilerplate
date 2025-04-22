@@ -373,7 +373,7 @@ const AdminNotificationList = ({ initialNotifications, initialUsers }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>Notification list</h1>
                 <h2>Total notifications: {filteredItems?.length}</h2>
@@ -1040,7 +1040,7 @@ const AdminNotificationList = ({ initialNotifications, initialUsers }) => {
                     </div>
                 )}
             </Modal>
-        </div>
+        </section>
     );
 };
 

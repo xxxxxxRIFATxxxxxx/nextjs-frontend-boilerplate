@@ -105,7 +105,7 @@ const AdminDashboardContent = ({
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>Dashboard</h1>
                 <h2>Total users: {users?.length}</h2>
@@ -114,7 +114,7 @@ const AdminDashboardContent = ({
                 <h2>Total files: {files?.length}</h2>
                 <h2>Total notifications: {notifications?.length}</h2>
             </div>
-        </div>
+        </section>
     );
 };
 

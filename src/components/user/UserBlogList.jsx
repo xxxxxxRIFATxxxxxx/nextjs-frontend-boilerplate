@@ -174,7 +174,7 @@ const UserBlogList = ({
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>Blog list</h1>
                 <h2>Total blogs: {filteredItems?.length}</h2>
@@ -374,7 +374,7 @@ const UserBlogList = ({
                     ))
                 )}
             </div>
-        </div>
+        </section>
     );
 };
 

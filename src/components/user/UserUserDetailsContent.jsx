@@ -41,7 +41,7 @@ const UserUserDetailsContent = ({ initialUser, id }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <Link href="/users">Back</Link>
             </div>
@@ -133,7 +133,7 @@ const UserUserDetailsContent = ({ initialUser, id }) => {
                 <h2>Updated</h2>
                 <p>{formatDateTime(user?.updatedAt)}</p>
             </div>
-        </div>
+        </section>
     );
 };
 

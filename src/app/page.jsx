@@ -36,12 +36,10 @@ const Home = async () => {
             </section>
 
             {!blogCategoriesError && !blogsError && (
-                <section>
-                    <UserHomeContent
-                        initialBlogCategories={initialBlogCategories}
-                        initialBlogs={initialBlogs}
-                    />
-                </section>
+                <UserHomeContent
+                    initialBlogCategories={initialBlogCategories}
+                    initialBlogs={initialBlogs}
+                />
             )}
         </UserLayout>
     );

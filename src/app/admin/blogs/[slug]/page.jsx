@@ -52,12 +52,10 @@ const BlogDetails = async ({ params }) => {
                 </section>
 
                 {!blogError && (
-                    <section>
-                        <AdminBlogDetailsContent
-                            initialBlog={initialBlog}
-                            slug={slug}
-                        />
-                    </section>
+                    <AdminBlogDetailsContent
+                        initialBlog={initialBlog}
+                        slug={slug}
+                    />
                 )}
             </AdminLayout>
         </PrivateRoute>

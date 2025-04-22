@@ -39,12 +39,10 @@ const Notifications = async () => {
                 </section>
 
                 {!notificationsError && !usersError && (
-                    <section>
-                        <AdminNotificationList
-                            initialNotifications={initialNotifications}
-                            initialUsers={initialUsers}
-                        />
-                    </section>
+                    <AdminNotificationList
+                        initialNotifications={initialNotifications}
+                        initialUsers={initialUsers}
+                    />
                 )}
             </AdminLayout>
         </PrivateRoute>

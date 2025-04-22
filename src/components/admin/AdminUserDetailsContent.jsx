@@ -42,7 +42,7 @@ const AdminUserDetailsContent = ({ initialUser, id }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <Link href="/admin/users">Back</Link>
             </div>
@@ -139,7 +139,7 @@ const AdminUserDetailsContent = ({ initialUser, id }) => {
                 <h2>Updated</h2>
                 <p>{formatDateTime(user?.updatedAt)}</p>
             </div>
-        </div>
+        </section>
     );
 };
 

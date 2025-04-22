@@ -49,12 +49,7 @@ const BlogDetails = async ({ params }) => {
             </section>
 
             {!blogError && (
-                <section>
-                    <UserBlogDetailsContent
-                        initialBlog={initialBlog}
-                        slug={slug}
-                    />
-                </section>
+                <UserBlogDetailsContent initialBlog={initialBlog} slug={slug} />
             )}
         </UserLayout>
     );

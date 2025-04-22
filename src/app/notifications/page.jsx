@@ -32,11 +32,9 @@ const Notifications = async () => {
                 </section>
 
                 {!notificationsError && (
-                    <section>
-                        <UserNotificationList
-                            initialNotifications={initialNotifications}
-                        />
-                    </section>
+                    <UserNotificationList
+                        initialNotifications={initialNotifications}
+                    />
                 )}
             </UserLayout>
         </PrivateRoute>

@@ -377,7 +377,7 @@ const AdminFileList = ({ initialFiles }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>File list</h1>
                 <h2>Total liles: {filteredItems?.length}</h2>
@@ -939,7 +939,7 @@ const AdminFileList = ({ initialFiles }) => {
                     </div>
                 )}
             </Modal>
-        </div>
+        </section>
     );
 };
 

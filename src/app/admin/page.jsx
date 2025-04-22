@@ -74,15 +74,13 @@ const Admin = async () => {
                     !blogsError &&
                     !filesError &&
                     !notificationsError && (
-                        <section>
-                            <AdminDashboardContent
-                                initialUsers={initialUsers}
-                                initialBlogCategories={initialBlogCategories}
-                                initialBlogs={initialBlogs}
-                                initialFiles={initialFiles}
-                                initialNotifications={initialNotifications}
-                            />
-                        </section>
+                        <AdminDashboardContent
+                            initialUsers={initialUsers}
+                            initialBlogCategories={initialBlogCategories}
+                            initialBlogs={initialBlogs}
+                            initialFiles={initialFiles}
+                            initialNotifications={initialNotifications}
+                        />
                     )}
             </AdminLayout>
         </PrivateRoute>

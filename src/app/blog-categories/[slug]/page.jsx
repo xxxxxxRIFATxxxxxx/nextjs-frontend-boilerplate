@@ -50,12 +50,10 @@ const BlogCategoryDetails = async ({ params }) => {
             </section>
 
             {!blogCategoryError && (
-                <section>
-                    <UserBlogCategoryDetailsContent
-                        initialBlogCategory={initialBlogCategory}
-                        slug={slug}
-                    />
-                </section>
+                <UserBlogCategoryDetailsContent
+                    initialBlogCategory={initialBlogCategory}
+                    slug={slug}
+                />
             )}
         </UserLayout>
     );

@@ -31,11 +31,7 @@ const Users = async () => {
                     )}
                 </section>
 
-                {!usersError && (
-                    <section>
-                        <UserUserList initialUsers={initialUsers} />
-                    </section>
-                )}
+                {!usersError && <UserUserList initialUsers={initialUsers} />}
             </UserLayout>
         </PrivateRoute>
     );

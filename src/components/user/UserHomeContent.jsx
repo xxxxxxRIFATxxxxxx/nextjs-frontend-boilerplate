@@ -55,13 +55,13 @@ const UserHomeContent = ({ initialBlogCategories, initialBlogs }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>Home</h1>
                 <h2>Total blog categories: {blogCategories?.length}</h2>
                 <h2>Total blogs: {blogs?.length}</h2>
             </div>
-        </div>
+        </section>
     );
 };
 

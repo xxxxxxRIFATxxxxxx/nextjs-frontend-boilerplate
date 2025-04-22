@@ -120,7 +120,7 @@ const UserNotificationList = ({ initialNotifications, initialUsers }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>Notification list</h1>
                 <h2>Total notifications: {filteredItems?.length}</h2>
@@ -235,7 +235,7 @@ const UserNotificationList = ({ initialNotifications, initialUsers }) => {
                     ))
                 )}
             </div>
-        </div>
+        </section>
     );
 };
 

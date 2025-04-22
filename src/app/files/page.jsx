@@ -31,11 +31,7 @@ const Files = async () => {
                     )}
                 </section>
 
-                {!filesError && (
-                    <section>
-                        <UserFileList initialFiles={initialFiles} />
-                    </section>
-                )}
+                {!filesError && <UserFileList initialFiles={initialFiles} />}
             </UserLayout>
         </PrivateRoute>
     );

@@ -32,11 +32,9 @@ const BlogCategories = async () => {
                 </section>
 
                 {!blogCategoriesError && (
-                    <section>
-                        <AdminBlogCategoryList
-                            initialBlogCategories={initialBlogCategories}
-                        />
-                    </section>
+                    <AdminBlogCategoryList
+                        initialBlogCategories={initialBlogCategories}
+                    />
                 )}
             </AdminLayout>
         </PrivateRoute>

@@ -44,7 +44,7 @@ const AdminBlogDetailsContent = ({ initialBlog, slug }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <Link href="/admin/blogs">Back</Link>
             </div>
@@ -136,7 +136,7 @@ const AdminBlogDetailsContent = ({ initialBlog, slug }) => {
                 <h2>Updated</h2>
                 <p>{formatDateTime(blog?.updatedAt)}</p>
             </div>
-        </div>
+        </section>
     );
 };
 

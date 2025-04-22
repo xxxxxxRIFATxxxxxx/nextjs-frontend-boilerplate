@@ -385,7 +385,7 @@ const AdminUserList = ({ initialUsers }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>User list</h1>
                 <h2>Total users: {filteredItems?.length}</h2>
@@ -1406,7 +1406,7 @@ const AdminUserList = ({ initialUsers }) => {
                     </div>
                 )}
             </Modal>
-        </div>
+        </section>
     );
 };
 

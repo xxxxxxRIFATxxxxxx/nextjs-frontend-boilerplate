@@ -52,12 +52,10 @@ const UserDetails = async ({ params }) => {
                 </section>
 
                 {!userError && (
-                    <section>
-                        <AdminUserDetailsContent
-                            initialUser={initialUser}
-                            id={id}
-                        />
-                    </section>
+                    <AdminUserDetailsContent
+                        initialUser={initialUser}
+                        id={id}
+                    />
                 )}
             </AdminLayout>
         </PrivateRoute>

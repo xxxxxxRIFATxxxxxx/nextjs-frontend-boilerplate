@@ -296,7 +296,7 @@ const AdminBlogCategoryList = ({ initialBlogCategories }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>Blog category list</h1>
                 <h2>Total blog categories: {filteredItems?.length}</h2>
@@ -745,7 +745,7 @@ const AdminBlogCategoryList = ({ initialBlogCategories }) => {
                     </div>
                 )}
             </Modal>
-        </div>
+        </section>
     );
 };
 

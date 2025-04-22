@@ -99,7 +99,7 @@ const UserFileList = ({ initialFiles }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>File list</h1>
                 <h2>Total files: {filteredItems?.length}</h2>
@@ -214,7 +214,7 @@ const UserFileList = ({ initialFiles }) => {
                     ))
                 )}
             </div>
-        </div>
+        </section>
     );
 };
 

@@ -495,7 +495,7 @@ const AdminBlogList = ({
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <h1>Blog list</h1>
                 <h2>Total blogs: {filteredItems?.length}</h2>
@@ -1223,7 +1223,7 @@ const AdminBlogList = ({
                     </div>
                 )}
             </Modal>
-        </div>
+        </section>
     );
 };
 

@@ -50,13 +50,11 @@ const Blogs = async () => {
                 </section>
 
                 {!blogsError && !blogCategoriesError && !usersError && (
-                    <section>
-                        <AdminBlogList
-                            initialBlogs={initialBlogs}
-                            initialBlogCategories={initialBlogCategories}
-                            initialUsers={initialUsers}
-                        />
-                    </section>
+                    <AdminBlogList
+                        initialBlogs={initialBlogs}
+                        initialBlogCategories={initialBlogCategories}
+                        initialUsers={initialUsers}
+                    />
                 )}
             </AdminLayout>
         </PrivateRoute>

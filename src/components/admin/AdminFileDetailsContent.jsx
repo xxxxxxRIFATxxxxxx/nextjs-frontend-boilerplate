@@ -39,7 +39,7 @@ const AdminFileDetailsContent = ({ initialFile, id }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <Link href="/admin/files">Back</Link>
             </div>
@@ -84,7 +84,7 @@ const AdminFileDetailsContent = ({ initialFile, id }) => {
                 <h2>Updated</h2>
                 <p>{formatDateTime(file?.updatedAt)}</p>
             </div>
-        </div>
+        </section>
     );
 };
 

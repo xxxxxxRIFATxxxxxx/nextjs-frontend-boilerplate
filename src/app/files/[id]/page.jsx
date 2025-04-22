@@ -52,12 +52,7 @@ const FileDetails = async ({ params }) => {
                 </section>
 
                 {!fileError && (
-                    <section>
-                        <UserFileDetailsContent
-                            initialFile={initialFile}
-                            id={id}
-                        />
-                    </section>
+                    <UserFileDetailsContent initialFile={initialFile} id={id} />
                 )}
             </UserLayout>
         </PrivateRoute>

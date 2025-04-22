@@ -42,7 +42,7 @@ const AdminNotificationDetailsContent = ({ initialNotification, id }) => {
     }, [socket]);
 
     return (
-        <div>
+        <section>
             <div>
                 <Link href="/admin/notifications">Back</Link>
             </div>
@@ -138,7 +138,7 @@ const AdminNotificationDetailsContent = ({ initialNotification, id }) => {
                 <h2>Updated</h2>
                 <p>{formatDateTime(notification?.updatedAt)}</p>
             </div>
-        </div>
+        </section>
     );
 };
 

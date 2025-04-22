@@ -30,11 +30,9 @@ const BlogCategories = async () => {
             </section>
 
             {!blogCategoriesError && (
-                <section>
-                    <UserBlogCategoryList
-                        initialBlogCategories={initialBlogCategories}
-                    />
-                </section>
+                <UserBlogCategoryList
+                    initialBlogCategories={initialBlogCategories}
+                />
             )}
         </UserLayout>
     );

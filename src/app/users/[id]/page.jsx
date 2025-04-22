@@ -52,12 +52,7 @@ const UserDetails = async ({ params }) => {
                 </section>
 
                 {!userError && (
-                    <section>
-                        <UserUserDetailsContent
-                            initialUser={initialUser}
-                            id={id}
-                        />
-                    </section>
+                    <UserUserDetailsContent initialUser={initialUser} id={id} />
                 )}
             </UserLayout>
         </PrivateRoute>
