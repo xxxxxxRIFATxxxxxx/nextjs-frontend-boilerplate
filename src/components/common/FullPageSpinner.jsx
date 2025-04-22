@@ -1,6 +1,6 @@
 const FullPageSpinner = () => {
     return (
-        <div className="flex items-center justify-center h-screen">
+        <section className="flex items-center justify-center h-screen">
             <div role="status">
                 <svg
                     aria-hidden="true"
@@ -20,7 +20,7 @@ const FullPageSpinner = () => {
                 </svg>
                 <span className="sr-only">Loading...</span>
             </div>
-        </div>
+        </section>
     );
 };
 
