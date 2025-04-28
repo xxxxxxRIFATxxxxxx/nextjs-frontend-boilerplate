@@ -35,7 +35,7 @@ const ResetPasswordContent = () => {
             setNewPassword("");
             setConfirmPassword("");
 
-            router.push("/login");
+            router.push("/common/login");
         } else {
             toast.error(response?.message || response);
         }

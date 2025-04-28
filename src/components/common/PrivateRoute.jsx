@@ -11,9 +11,9 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
     useEffect(() => {
         if (!loading) {
             if (!user) {
-                router.replace("/login");
+                router.replace("/common/login");
             } else if (!allowedRoles.includes(user?.role)) {
-                router.replace("/unauthorized");
+                router.replace("/common/unauthorized");
             }
         }
     }, [user, loading, router, allowedRoles]);

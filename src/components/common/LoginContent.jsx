@@ -81,14 +81,14 @@ const LoginContent = () => {
                 </button>
 
                 <div>
-                    <Link href="/forgot-password" className="">
+                    <Link href="/common/forgot-password" className="">
                         Forgot password?
                     </Link>
                 </div>
 
                 <p className="">
                     Don’t have an account yet?{" "}
-                    <Link href="/signup" className="">
+                    <Link href="/common/signup" className="">
                         Sign up
                     </Link>
                 </p>

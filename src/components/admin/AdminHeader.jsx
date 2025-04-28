@@ -9,7 +9,7 @@ const AdminHeader = () => {
     return (
         <header>
             <div className="bg-gray-100 p-4 flex items-center justify-center space-x-4 text-center">
-                <Link href="/">Home</Link>
+                <Link href="/user">Home</Link>
 
                 {user ? (
                     <>
@@ -27,7 +27,7 @@ const AdminHeader = () => {
 
                         <Link href="/admin/notifications">Notifications</Link>
 
-                        <Link href="/profile">{user?.fullName}</Link>
+                        <Link href="/common/profile">{user?.fullName}</Link>
 
                         <button onClick={logout} className="cursor-pointer">
                             Logout
@@ -36,7 +36,7 @@ const AdminHeader = () => {
                         <NotificationTab />
                     </>
                 ) : (
-                    <Link href="/login">Login</Link>
+                    <Link href="/common/login">Login</Link>
                 )}
             </div>
         </header>

@@ -42,15 +42,15 @@ const UserHeader = () => {
             </form>
 
             <div className="bg-gray-100 p-4 flex items-center justify-center space-x-4 text-center">
-                <Link href="/">Home</Link>
+                <Link href="/user">Home</Link>
 
-                <Link href="/blogs">Blogs</Link>
+                <Link href="/user/blogs">Blogs</Link>
 
-                <Link href="/blog-categories">Blog categories</Link>
+                <Link href="/user/blog-categories">Blog categories</Link>
 
                 {user ? (
                     <>
-                        <Link href="/profile">{user?.fullName}</Link>
+                        <Link href="/common/profile">{user?.fullName}</Link>
 
                         <RoleBasedComponent
                             allowedRoles={["super_admin", "admin", "moderator"]}
@@ -65,7 +65,7 @@ const UserHeader = () => {
                         <NotificationTab />
                     </>
                 ) : (
-                    <Link href="/login">Login</Link>
+                    <Link href="/common/login">Login</Link>
                 )}
             </div>
         </header>

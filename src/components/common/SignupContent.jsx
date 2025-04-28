@@ -160,7 +160,10 @@ const SignupContent = () => {
 
                     <label htmlFor="terms-and-conditions" className="">
                         I accept the{" "}
-                        <Link href="/terms-and-conditions" target="_blank">
+                        <Link
+                            href="/common/terms-and-conditions"
+                            target="_blank"
+                        >
                             Terms and conditions
                         </Link>
                     </label>
@@ -176,7 +179,7 @@ const SignupContent = () => {
 
                 <p className="">
                     Already have an account?{" "}
-                    <Link href="/login" className="">
+                    <Link href="/common/login" className="">
                         Login
                     </Link>
                 </p>

@@ -109,7 +109,7 @@ export const AuthProvider = ({ children }) => {
 
             const decoded = decodeToken(response?.data?.token);
             if (decoded) scheduleAutoLogout(decoded.exp);
-            router.push("/");
+            router.push("/user");
 
             return response?.data;
         } catch (error) {
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }) => {
 
             const decoded = decodeToken(response?.data?.token);
             if (decoded) scheduleAutoLogout(decoded.exp);
-            router.push("/");
+            router.push("/user");
 
             return response?.data;
         } catch (error) {
@@ -208,7 +208,7 @@ export const AuthProvider = ({ children }) => {
         removeAuthCookies();
         setUser(null);
         clearTimeout(logoutTimer);
-        router.push("/login");
+        router.push("/common/login");
     };
 
     return (
